@@ -38,8 +38,8 @@
   const sum = (items, k) => Math.round(items.reduce((a, b) => a + (+b[k] || 0), 0));
   function targets(st) {
     const k = st.kcalTarget;
-    const carbRatio = st.goal === "diabetes" ? 0.45 : st.goal === "bulk" ? 0.5 : 0.5;
-    return { kcal: k, protein: st.proteinTarget, carbs: Math.round(k * carbRatio / 4), fat: Math.round(k * 0.25 / 9), sodium: st.goal === "hypertension" ? 1500 : 2000 };
+    const carbRatio = st.goals.includes("diabetes") ? 0.45 : 0.5;
+    return { kcal: k, protein: st.proteinTarget, carbs: Math.round(k * carbRatio / 4), fat: Math.round(k * 0.25 / 9), sodium: st.goals.includes("hypertension") ? 1500 : 2000 };
   }
   const fmtDate = d => { const z = n => String(n).padStart(2, "0"); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`; };
 
@@ -47,7 +47,7 @@
   function render() {
     const st = App.getState(), items = st.log.items, tg = targets(st);
     const prof = { nick: "지식 사용자", avatar: "🧑‍🍳", ...st.profile };
-    const g = App.goals[st.goal];
+    const g = { label: st.goalLabel };
 
     // 기록 연속 일수
     const days = new Set(st.daily.filter(d => d.count).map(d => d.date));
@@ -124,7 +124,7 @@
     else tips.push(`목표까지 ${tg.kcal - now.kcal}kcal 남았어요.`);
     if (now.protein < tg.protein * 0.5 && now.kcal > tg.kcal * 0.5) tips.push("단백질이 부족해요 — 닭가슴살·달걀·두부를 추천해요.");
     if (now.sodium > tg.sodium) tips.push(`나트륨이 ${now.sodium}mg로 권장량을 넘었어요. 국물은 남기는 걸 추천해요.`);
-    if (st.goal === "diabetes" && now.carbs > tg.carbs * 0.8) tips.push("탄수화물 섭취가 많아요. 다음 끼는 잡곡·채소 위주로!");
+    if (st.goals.includes("diabetes") && now.carbs > tg.carbs * 0.8) tips.push("탄수화물 섭취가 많아요. 다음 끼는 잡곡·채소 위주로!");
     return "💡 " + tips.join(" ");
   }
 
@@ -203,10 +203,10 @@
     const nowK = sum(st.log.items, "kcal");
     const after = nowK + v("kcal");
     const warn = [];
-    if (st.goal === "hypertension" && v("sodium") > 800) warn.push(`나트륨 ${v("sodium")}mg — 고혈압 목표에는 조금 짜요`);
-    if (st.goal === "diabetes" && v("carbs") > 70) warn.push(`탄수화물 ${v("carbs")}g — 혈당 관리에 주의`);
-    if (st.goal === "diet" && v("kcal") > 650) warn.push("한 끼 열량이 높은 편이에요");
-    if (st.goal === "bulk" && v("protein") < 20) warn.push("단백질을 조금 더 보충해 보세요");
+    if (st.goals.includes("hypertension") && v("sodium") > 800) warn.push(`나트륨 ${v("sodium")}mg — 고혈압 목표에는 조금 짜요`);
+    if (st.goals.includes("diabetes") && v("carbs") > 70) warn.push(`탄수화물 ${v("carbs")}g — 혈당 관리에 주의`);
+    if (st.goals.includes("diet") && v("kcal") > 650) warn.push("한 끼 열량이 높은 편이에요");
+    if (st.goals.includes("bulk") && v("protein") < 20) warn.push("단백질을 조금 더 보충해 보세요");
     $("foodResult").innerHTML = `
       <div class="fr-top">
         <img src="${r.photo}" alt="">

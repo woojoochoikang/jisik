@@ -63,7 +63,10 @@
     goal: "diet", kcalTarget: GOALS.diet.kcal, proteinTarget: GOALS.diet.protein,
     fridge: [], log: { date: todayStr(), items: [] }, history: [], firstVisit: true
   };
-  state.daily = state.daily || [];   // 지난 날짜별 섭취 요약 (마이페이지 주간 그래프용)
+  state.daily = state.daily || [];
+  // 여러 목표 동시 선택 (예: 당뇨 + 다이어트). state.goal은 첫 번째 목표(이전 버전 호환)
+  if (!Array.isArray(state.goals) || !state.goals.length) state.goals = [state.goal || "balance"];
+  state.goal = state.goals[0];   // 지난 날짜별 섭취 요약 (마이페이지 주간 그래프용)
   if (state.log.date !== todayStr()) {
     if (state.log.items.length) {
       const sum = k => state.log.items.reduce((a, b) => a + (b[k] || 0), 0);
@@ -100,8 +103,8 @@
   function hue(str) { let h = 0; for (const c of str) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
 
   // ---------- 추천 점수 ----------
-  function goalFit(r) {
-    const g = state.goal; let s = 0; const good = [], bad = [];
+  function goalFitOne(g, r) {
+    let s = 0; const good = [], bad = [];
     if (g === "diet") {
       if (r.kcal <= 400) { s += 15; good.push("저칼로리"); } else if (r.kcal <= 550) s += 8; else if (r.kcal > 650) { s -= 10; bad.push("고칼로리"); }
       if (r.protein >= 20) { s += 6; good.push(`단백질 ${r.protein}g`); }
@@ -121,6 +124,18 @@
       if (r.kcal >= 350 && r.kcal <= 700) { s += 8; good.push("균형 잡힌 열량"); }
     }
     return { s, good: [...new Set(good)], bad };
+  }
+  // 선택한 목표들의 점수를 모두 더해서, 여러 조건을 함께 만족하는 메뉴가 위로 오게 함
+  function goalFit(r) {
+    let s = 0; const good = [], bad = [];
+    state.goals.forEach(g => { const f = goalFitOne(g, r); s += f.s; good.push(...f.good); bad.push(...f.bad); });
+    return { s, good: [...new Set(good)], bad: [...new Set(bad)] };
+  }
+  const goalLabel = () => state.goals.map(g => GOALS[g].label).join(" + ");
+  // 여러 목표의 칼로리·단백질 기준 합치기: 다이어트/벌크업이 있으면 그 칼로리, 아니면 가장 낮은 값 / 단백질은 가장 높은 값
+  function combinedTargets(goals) {
+    const kcal = goals.includes("diet") ? GOALS.diet.kcal : goals.includes("bulk") ? GOALS.bulk.kcal : Math.min(...goals.map(g => GOALS[g].kcal));
+    return { kcal, protein: Math.max(...goals.map(g => GOALS[g].protein)) };
   }
 
   let jitter = {};
@@ -160,9 +175,12 @@
 
   // ---------- 렌더링: 목표 ----------
   function renderGoal() {
+    $("#goalChips").setAttribute("role", "group");
     $("#goalChips").innerHTML = Object.entries(GOALS).map(([k, g]) =>
-      `<button class="chip" role="radio" aria-checked="${state.goal === k}" data-goal="${k}">${g.label}</button>`).join("");
-    $("#goalDesc").textContent = GOALS[state.goal].desc;
+      `<button class="chip" role="checkbox" aria-checked="${state.goals.includes(k)}" data-goal="${k}">${state.goals.includes(k) ? "✓ " : ""}${g.label}</button>`).join("");
+    $("#goalDesc").innerHTML = state.goals.length > 1
+      ? `<b>복합 목표: ${esc(goalLabel())}</b><br>${state.goals.map(g => "· " + esc(GOALS[g].desc)).join("<br>")}`
+      : esc(GOALS[state.goals[0]].desc) + '<br><small class="goal-hint">💡 여러 개를 함께 고를 수 있어요 (예: 당뇨 관리 + 다이어트)</small>';
     $("#kcalTarget").value = state.kcalTarget;
     $("#proteinTarget").value = state.proteinTarget;
     renderIntake();
@@ -242,7 +260,7 @@
     } else ub.hidden = true;
 
     const eaten = state.log.items.reduce((a, b) => a + b.kcal, 0);
-    $("#recSub").textContent = `${GOALS[state.goal].label} 목표 · 오늘 남은 칼로리 약 ${Math.max(0, state.kcalTarget - eaten)}kcal · 냉장고 재료 ${state.fridge.length}개 기준`;
+    $("#recSub").textContent = `${goalLabel()} 목표 · 오늘 남은 칼로리 약 ${Math.max(0, state.kcalTarget - eaten)}kcal · 냉장고 재료 ${state.fridge.length}개 기준`;
 
     $("#recEmpty").hidden = list.length > 0;
     $("#recGrid").innerHTML = list.slice(0, 12).map((x, i) => card(x, i)).join("");
@@ -678,8 +696,19 @@
 
     $("#goalChips").addEventListener("click", e => {
       const b = e.target.closest("[data-goal]"); if (!b) return;
-      state.goal = b.dataset.goal;
-      state.kcalTarget = GOALS[state.goal].kcal; state.proteinTarget = GOALS[state.goal].protein;
+      const k = b.dataset.goal;
+      let goals = state.goals.filter(g => g !== "balance");
+      if (k === "balance") goals = ["balance"];
+      else if (goals.includes(k)) goals = goals.filter(g => g !== k);
+      else {
+        const clash = { diet: "bulk", bulk: "diet" }[k];
+        if (clash && goals.includes(clash)) { goals = goals.filter(g => g !== clash); toast("다이어트와 벌크업은 함께 고를 수 없어서 바꿨어요"); }
+        goals.push(k);
+      }
+      if (!goals.length) goals = ["balance"];
+      state.goals = goals; state.goal = goals[0];
+      const t = combinedTargets(goals);
+      state.kcalTarget = t.kcal; state.proteinTarget = t.protein;
       save(); renderGoal(); renderRecs();
     });
     $("#kcalTarget").addEventListener("change", e => { state.kcalTarget = Math.max(800, +e.target.value || 2000); save(); renderIntake(); renderRecs(); });
@@ -752,7 +781,7 @@
     clearFridge: () => { state.fridge = []; save(); renderFridge(); renderRecs(); },
     // ---- 마이페이지 · AI 대화용 ----
     goals: GOALS,
-    getState: () => JSON.parse(JSON.stringify({ goal: state.goal, kcalTarget: state.kcalTarget, proteinTarget: state.proteinTarget, profile: state.profile || {}, fridge: state.fridge, log: state.log, daily: state.daily })),
+    getState: () => JSON.parse(JSON.stringify({ goal: state.goal, goals: state.goals, goalLabel: goalLabel(), kcalTarget: state.kcalTarget, proteinTarget: state.proteinTarget, profile: state.profile || {}, fridge: state.fridge, log: state.log, daily: state.daily })),
     setProfile: patch => { state.profile = { ...(state.profile || {}), ...patch }; save(); },
     setDaily: daily => { state.daily = daily; save(); },
     addMeal: meal => {
@@ -761,7 +790,8 @@
     },
     removeMeal: index => { state.log.items.splice(index, 1); save(); renderIntake(); renderRecs(); },
     topRecipes: (n = 3) => RECIPES.map(analyze).sort((a, b) => b.score - a.score).slice(0, n)
-      .map(x => ({ id: x.r.id, name: x.r.name, emoji: x.r.emoji, kcal: x.r.kcal, protein: x.r.protein, time: x.r.time, missing: x.missing.map(m => m.n), urgent: x.urgent.map(u => u.n) })),
+      .map(x => ({ id: x.r.id, name: x.r.name, emoji: x.r.emoji, kcal: x.r.kcal, protein: x.r.protein, carbs: x.r.carbs, fat: x.r.fat, sugar: x.r.sugar, sodium: x.r.sodium,
+        tags: x.r.tags, time: x.r.time, score: x.score, missing: x.missing.map(m => m.n), urgent: x.urgent.map(u => u.n), good: x.fit.good, bad: x.fit.bad })),
     recipes: () => RECIPES,
     openRecipe: id => openRecipe(id)
   };

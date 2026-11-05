@@ -368,3 +368,6 @@ dialog::backdrop { background: rgba(10, 20, 10, .5); backdrop-filter: blur(3px);
 }
 
 @media (hover: none) { .drop { display: none; } }
+
+.goal-hint { color: var(--brand); font-size: .8rem; }
+.goal-desc b { color: var(--text); }

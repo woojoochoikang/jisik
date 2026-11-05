@@ -68,7 +68,7 @@
     if (food) { select(food.dataset.food); return; }
   });
   // 탭: [탭 버튼 id, 패널 id, 주소 해시] — 탭을 추가하려면 여기에 한 줄만 추가
-  const TABS = [['mealTab', 'mealPanel', 'meals'], ['fridgeTab', 'fridgePanel', 'fridge'], ['simTab', 'simPanel', 'camera'], ['myTab', 'myPanel', 'my']]
+  const TABS = [['mealTab', 'mealPanel', 'meals'], ['fridgeTab', 'fridgePanel', 'fridge'], ['simTab', 'simPanel', 'camera'], ['wearTab', 'wearPanel', 'wearable'], ['myTab', 'myPanel', 'my']]
     .filter(([t, p]) => $(t) && $(p));
   function showTab(index, focus = false) {
     TABS.forEach(([t, p], i) => {

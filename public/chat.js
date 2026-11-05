@@ -8,7 +8,7 @@
   if (!App || !document.getElementById("chatPanel")) return;
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const CHIPS = ["오늘 뭐 먹지?", "유통기한 임박 재료 알려줘", "남은 칼로리는?", "단백질 많은 메뉴", "두부로 만들 수 있는 요리", "장보기 목록 만들어줘"];
+  const CHIPS = ["오늘 뭐 먹지?", "지금 내 혈당에 맞는 메뉴", "유통기한 임박 재료 알려줘", "남은 칼로리는?", "단백질 많은 메뉴", "두부로 만들 수 있는 요리", "장보기 목록 만들어줘"];
 
   let features = { aiScan: false }, msgs = [], busy = false, greeted = false;
 
@@ -48,7 +48,7 @@
     const eaten = st.log.items.reduce((a, b) => a + (+b.kcal || 0), 0);
     const protein = st.log.items.reduce((a, b) => a + (+b.protein || 0), 0);
     const fridge = st.fridge.map(f => ({ name: f.name, d: App.dday(f.exp) })).sort((a, b) => a.d - b.d);
-    return { st, goal: App.goals[st.goal], eaten: Math.round(eaten), protein: Math.round(protein), remain: Math.round(st.kcalTarget - eaten), fridge, urgent: fridge.filter(f => f.d >= 0 && f.d <= 3), top: App.topRecipes(24) };
+    return { st, goal: { label: st.goalLabel }, eaten: Math.round(eaten), protein: Math.round(protein), remain: Math.round(st.kcalTarget - eaten), fridge, urgent: fridge.filter(f => f.d >= 0 && f.d <= 3), top: App.topRecipes(24) };
   }
   const dtext = d => d < 0 ? `${-d}일 지남` : d === 0 ? "오늘까지" : `D-${d}`;
   const openAct = r => ({ label: `${r.emoji} ${r.name} 레시피 보기`, type: "recipe", id: r.id });
@@ -83,6 +83,12 @@
       const list = c.top.filter(t => recipes.find(r => r.id === t.id).ingredients.some(x => x.n === ing)).slice(0, 3);
       if (!list.length) return { text: `${ing}이(가) 들어가는 레시피는 아직 없어요 😢 다른 재료로 물어봐 주세요!` };
       return { text: `**${ing}**로 만들 수 있는 요리예요:\n` + list.map((r, i) => `${i + 1}. ${r.emoji} ${r.name} · ${r.kcal}kcal — ${why(r)}`).join("\n"), actions: list.map(openAct) };
+    }
+
+    if (/(혈당|혈압|심박|건강|웨어러블|워치|컨디션|몸상태)/.test(s)) {
+      const h = window.JisikHealth?.summary?.();
+      if (!h) return { text: "웨어러블 기기가 아직 연결되지 않았어요. '⌚ 웨어러블 연동 시연'에서 기기를 연결하면 혈당·혈압에 맞춰 추천해 드려요.", actions: [{ label: "⌚ 웨어러블 연결하러 가기", type: "tab", hash: "wearable" }] };
+      return { text: `⌚ 지금 측정값: 혈당 ${h.혈당}, 혈압 ${h.혈압}, 심박 ${h.심박}\n${h.상태}\n${h.조언}\n\n지금 몸 상태에 맞는 추천:\n` + h.추천.map((r, i) => `${i + 1}. ${r.emoji} ${r.name} — ${r.why.join(", ")}`).join("\n"), actions: h.추천.slice(0, 2).map(openAct) };
     }
 
     if (/(유통|임박|기한|상하|버려|오래된)/.test(s)) {
@@ -139,6 +145,7 @@
           목표: c.goal.label, 하루칼로리목표: c.st.kcalTarget, 단백질목표: c.st.proteinTarget,
           오늘섭취: { kcal: c.eaten, 단백질: c.protein, 식사: c.st.log.items.map(i => `${i.name} ${Math.round(i.kcal)}kcal`) },
           냉장고: c.fridge.map(f => `${f.name}(${dtext(f.d)})`),
+          웨어러블건강데이터: window.JisikHealth?.summary?.() || "연결 안 됨",
           추천순위: c.top.slice(0, 8).map(r => ({ 이름: r.name, kcal: r.kcal, 단백질: r.protein, 부족재료: r.missing, 임박재료: r.urgent })),
           전체레시피: App.recipes().map(r => r.name)
         };

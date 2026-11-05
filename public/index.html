@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="fridge3d.css">
   <link rel="stylesheet" href="simcam.css">
   <link rel="stylesheet" href="extras.css">
+  <link rel="stylesheet" href="wearable.css">
 </head>
 <body>
   <header class="topbar">
@@ -27,6 +28,7 @@
     <button type="button" role="tab" id="mealTab" aria-controls="mealPanel" aria-selected="true" tabindex="0">🍳 오늘의 식단</button>
     <button type="button" role="tab" id="fridgeTab" aria-controls="fridgePanel" aria-selected="false" tabindex="-1">🧊 내 냉장고를 한눈에</button>
     <button type="button" role="tab" id="simTab" aria-controls="simPanel" aria-selected="false" tabindex="-1">📹 냉장고 카메라 시연</button>
+    <button type="button" role="tab" id="wearTab" aria-controls="wearPanel" aria-selected="false" tabindex="-1">⌚ 웨어러블 연동 시연</button>
     <button type="button" role="tab" id="myTab" aria-controls="myPanel" aria-selected="false" tabindex="-1">👤 마이페이지</button>
   </nav>
   <main class="layout">
@@ -59,6 +61,44 @@
         </aside>
       </div>
     </section>
+    <!-- 발표용: 웨어러블 건강 데이터 연동 시뮬레이션 -->
+    <section class="wear" id="wearPanel" role="tabpanel" aria-labelledby="wearTab" hidden>
+      <div class="sim-head">
+        <div>
+          <span class="sim-eyebrow">PRESENTATION DEMO · WEARABLE HEALTH SYNC</span>
+          <h1>웨어러블 건강 데이터 연동 시뮬레이션</h1>
+          <p>스마트워치와 연속혈당측정기(CGM)의 <b>혈당·혈압·심박·활동량</b>을 실시간으로 받아 지금 몸 상태에 맞는 식단을 추천하는 과정을 재현해요.</p>
+        </div>
+        <div class="sim-head-btns">
+          <button type="button" class="primary" id="wearConnect">🔗 기기 연결하기</button>
+          <button type="button" class="ghost" id="wearAuto" disabled>▶ 자동 시나리오</button>
+        </div>
+      </div>
+
+      <div class="wear-body">
+        <div class="wear-left">
+          <div class="watch" id="wearWatch">
+            <div class="watch-face" id="wearFace"><span class="wf-off">⌚<br>연결 대기 중</span></div>
+          </div>
+          <ul class="devices" id="wearDevices"></ul>
+          <div class="sim-card">
+            <h2>🎬 상황 바꿔보기</h2>
+            <div class="scenarios" id="wearScenarios"></div>
+          </div>
+        </div>
+
+        <div class="wear-main">
+          <div class="metrics" id="wearMetrics"></div>
+          <div class="wear-reco" id="wearReco"></div>
+          <div class="sim-card">
+            <h2>🔔 건강 알림</h2>
+            <ol class="sim-log" id="wearLog"><li class="empty-log">기기를 연결하면 실시간 데이터가 들어와요.</li></ol>
+          </div>
+          <p class="wear-note">※ 발표용 시뮬레이션 데이터예요. 실제 기기와 연결되지 않으며, 의학적 진단·처방을 대신하지 않아요.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- 마이페이지: 프로필 · 오늘 영양 · 음식 사진 기록 · 주간 그래프 -->
     <section class="mypage" id="myPanel" role="tabpanel" aria-labelledby="myTab" hidden>
       <div class="my-grid">
@@ -345,5 +385,6 @@
   <script src="simcam.js"></script>
   <script src="mypage.js"></script>
   <script src="chat.js"></script>
+  <script src="wearable.js"></script>
 </body>
 </html>
