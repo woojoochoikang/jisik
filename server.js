@@ -103,6 +103,44 @@ async function aiScan(dataUrl, known) {
   return JSON.parse(json);
 }
 
+// ---------- Claude 공통 호출 ----------
+async function claude(messages, system, maxTokens = 1200) {
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "x-api-key": cfg.anthropicKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+    body: JSON.stringify({ model: cfg.anthropicModel, max_tokens: maxTokens, system, messages })
+  });
+  const data = await r.json();
+  if (!r.ok) throw new Error(data?.error?.message || `Claude API 오류 ${r.status}`);
+  return (data.content || []).filter(c => c.type === "text").map(c => c.text).join("");
+}
+
+// ---------- AI 식단 상담 ----------
+async function aiChat(history, context) {
+  const system = `당신은 식단 관리 앱 '지식(지루하지 않은 식단)'의 AI 영양 상담사예요.
+사용자의 식단 목표, 냉장고 재료(유통기한 포함), 오늘 먹은 음식, 앱의 레시피 목록이 아래 JSON에 있어요.
+- 한국어로, 친근하고 짧게(5~8문장 이내) 답하세요. 목록은 '- '로 시작하는 짧은 줄로.
+- 메뉴를 추천할 때는 가능하면 앱 레시피 목록의 이름을 그대로 쓰고, 유통기한 임박 재료를 먼저 쓰는 메뉴를 우선하세요.
+- 당뇨·고혈압 등 질환 관련 조언은 일반 정보로만 말하고, 필요하면 의료진 상담을 권하세요.
+앱 데이터: ${JSON.stringify(context).slice(0, 12000)}`;
+  const messages = history.slice(-12).map(m => ({ role: m.role === "user" ? "user" : "assistant", content: String(m.text).slice(0, 2000) }));
+  return claude(messages, system, 800);
+}
+
+// ---------- 음식 사진 분석 ----------
+async function aiFood(dataUrl) {
+  const m = /^data:(image\/(?:jpeg|png|webp|gif));base64,(.+)$/.exec(dataUrl || "");
+  if (!m) throw new Error("이미지 형식이 올바르지 않아요");
+  const text = await claude([{ role: "user", content: [
+    { type: "image", source: { type: "base64", media_type: m[1], data: m[2] } },
+    { type: "text", text: `이 음식 사진을 보고 1인분 기준 영양성분을 추정해 JSON으로만 답하세요.
+{"name":"대표 음식 이름(한국어)","emoji":"어울리는 이모지 1개","serving":"추정 양(예: 1공기, 1그릇 400g)","confidence":0~100,
+ "kcal":숫자,"protein":g,"carbs":g,"fat":g,"sodium":mg,"items":["보이는 음식/반찬 목록"],"comment":"한 줄 영양 코멘트"}
+음식이 아니면 name을 "음식 아님"으로 하세요.` }
+  ] }], undefined, 600);
+  return JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1));
+}
+
 // ---------- 라우팅 ----------
 const server = http.createServer(async (req, res) => {
   let u;
@@ -126,6 +164,15 @@ const server = http.createServer(async (req, res) => {
     try {
       const body = JSON.parse(await readBody(req, 8 * 1024 * 1024));
       return sendJSON(res, 200, await aiScan(body.image, (body.known || []).slice(0, 200)));
+    } catch (e) { return sendJSON(res, 500, { error: e.message }); }
+  }
+
+  if ((urlPath === "/api/chat" || urlPath === "/api/food") && req.method === "POST") {
+    if (!features.aiScan) return sendJSON(res, 501, { error: "Claude API 키가 설정되지 않았어요" });
+    try {
+      const body = JSON.parse(await readBody(req, urlPath === "/api/food" ? 8 * 1024 * 1024 : 512 * 1024));
+      if (urlPath === "/api/chat") return sendJSON(res, 200, { text: await aiChat(body.messages || [], body.context || {}) });
+      return sendJSON(res, 200, await aiFood(body.image));
     } catch (e) { return sendJSON(res, 500, { error: e.message }); }
   }
 
@@ -153,7 +200,7 @@ server.listen(PORT, "0.0.0.0", () => {
   ips.forEach(ip => console.log(`  같은 와이파이/네트워크: http://${ip}:${PORT}`));
   console.log("");
   console.log(`  최저가 검색(네이버 쇼핑 API) : ${features.shop ? "켜짐 ✅" : "꺼짐 — 쇼핑몰 '낮은 가격순' 링크로 대체"}`);
-  console.log(`  사진 인식(Claude API)       : ${features.aiScan ? `켜짐 ✅ (${cfg.anthropicModel})` : "꺼짐 — 브라우저 무료 OCR(Tesseract) 사용"}`);
+  console.log(`  AI 기능(Claude API)        : ${features.aiScan ? `켜짐 ✅ (${cfg.anthropicModel}) — 영수증 인식·AI 상담·음식 사진 분석` : "꺼짐 — 데모 모드(무료 OCR·규칙 기반 상담·예시 음식 추정)"}`);
   console.log("\n  인터넷 어디서나 접속하려면 share.bat(Cloudflare 터널)을 함께 실행하세요.");
   console.log("  종료: 이 창에서 Ctrl + C\n");
 });

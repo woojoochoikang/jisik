@@ -63,7 +63,16 @@
     goal: "diet", kcalTarget: GOALS.diet.kcal, proteinTarget: GOALS.diet.protein,
     fridge: [], log: { date: todayStr(), items: [] }, history: [], firstVisit: true
   };
-  if (state.log.date !== todayStr()) state.log = { date: todayStr(), items: [] };
+  state.daily = state.daily || [];   // 지난 날짜별 섭취 요약 (마이페이지 주간 그래프용)
+  if (state.log.date !== todayStr()) {
+    if (state.log.items.length) {
+      const sum = k => state.log.items.reduce((a, b) => a + (b[k] || 0), 0);
+      state.daily = state.daily.filter(d => d.date !== state.log.date);
+      state.daily.push({ date: state.log.date, kcal: sum("kcal"), protein: sum("protein"), carbs: sum("carbs"), fat: sum("fat"), sodium: sum("sodium"), count: state.log.items.length });
+      state.daily = state.daily.sort((a, b) => a.date.localeCompare(b.date)).slice(-60);
+    }
+    state.log = { date: todayStr(), items: [] };
+  }
 
   // ---------- 유틸 ----------
   const $ = s => document.querySelector(s);
@@ -385,7 +394,7 @@
 
   function finishCooking() {
     const r = cur.r;
-    state.log.items.push({ id: r.id, name: r.name, kcal: r.kcal, protein: r.protein });
+    state.log.items.push({ id: r.id, name: r.name, kcal: r.kcal, protein: r.protein, carbs: r.carbs, fat: r.fat, sodium: r.sodium, emoji: r.emoji, source: "recipe", time: Date.now() });
     state.history.push({ id: r.id, date: todayStr() });
     state.history = state.history.filter(h => dday(h.date) >= -14);
     let removed = [];
@@ -741,6 +750,19 @@
     addItem, removeItem, topRecipe, emojiOf, norm, dday, addDays,
     getFridge: () => state.fridge.map(f => ({ ...f })),
     clearFridge: () => { state.fridge = []; save(); renderFridge(); renderRecs(); },
+    // ---- 마이페이지 · AI 대화용 ----
+    goals: GOALS,
+    getState: () => JSON.parse(JSON.stringify({ goal: state.goal, kcalTarget: state.kcalTarget, proteinTarget: state.proteinTarget, profile: state.profile || {}, fridge: state.fridge, log: state.log, daily: state.daily })),
+    setProfile: patch => { state.profile = { ...(state.profile || {}), ...patch }; save(); },
+    setDaily: daily => { state.daily = daily; save(); },
+    addMeal: meal => {
+      state.log.items.push({ id: "meal-" + uid(), time: Date.now(), source: "photo", ...meal });
+      save(); renderIntake(); renderRecs();
+    },
+    removeMeal: index => { state.log.items.splice(index, 1); save(); renderIntake(); renderRecs(); },
+    topRecipes: (n = 3) => RECIPES.map(analyze).sort((a, b) => b.score - a.score).slice(0, n)
+      .map(x => ({ id: x.r.id, name: x.r.name, emoji: x.r.emoji, kcal: x.r.kcal, protein: x.r.protein, time: x.r.time, missing: x.missing.map(m => m.n), urgent: x.urgent.map(u => u.n) })),
+    recipes: () => RECIPES,
     openRecipe: id => openRecipe(id)
   };
 })();

@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="fridge3d.css">
   <link rel="stylesheet" href="simcam.css">
+  <link rel="stylesheet" href="extras.css">
 </head>
 <body>
   <header class="topbar">
@@ -16,13 +17,17 @@
       <span class="logo">지식</span>
       <span class="tagline">지루하지 않은 식단</span>
     </div>
-    <div class="today" id="todayLabel"></div>
+    <div class="top-actions">
+      <div class="today" id="todayLabel"></div>
+      <button type="button" class="chat-open" id="chatOpen" aria-controls="chatPanel" aria-expanded="false">💬 AI 식단 상담</button>
+    </div>
   </header>
 
   <nav class="app-tabs" role="tablist" aria-label="주요 화면">
     <button type="button" role="tab" id="mealTab" aria-controls="mealPanel" aria-selected="true" tabindex="0">🍳 오늘의 식단</button>
     <button type="button" role="tab" id="fridgeTab" aria-controls="fridgePanel" aria-selected="false" tabindex="-1">🧊 내 냉장고를 한눈에</button>
     <button type="button" role="tab" id="simTab" aria-controls="simPanel" aria-selected="false" tabindex="-1">📹 냉장고 카메라 시연</button>
+    <button type="button" role="tab" id="myTab" aria-controls="myPanel" aria-selected="false" tabindex="-1">👤 마이페이지</button>
   </nav>
   <main class="layout">
     <section class="fridge-studio" id="fridgePanel" role="tabpanel" aria-labelledby="fridgeTab" hidden>
@@ -54,6 +59,39 @@
         </aside>
       </div>
     </section>
+    <!-- 마이페이지: 프로필 · 오늘 영양 · 음식 사진 기록 · 주간 그래프 -->
+    <section class="mypage" id="myPanel" role="tabpanel" aria-labelledby="myTab" hidden>
+      <div class="my-grid">
+        <div class="my-col">
+          <div class="my-card my-profile" id="myProfile"></div>
+          <div class="my-card" id="myToday"></div>
+          <div class="my-card" id="myWeek"></div>
+        </div>
+        <div class="my-col">
+          <div class="my-card my-upload">
+            <div class="my-card-head"><h2>📸 오늘 먹은 음식 기록</h2><span class="mode-badge" id="foodMode"></span></div>
+            <p class="sub">음식 사진을 올리면 AI가 메뉴를 추정하고 칼로리·영양성분을 분석해 <b>오늘 목표에 자동으로 더해요.</b></p>
+            <div id="foodPick">
+              <div class="pick-btns">
+                <label class="pick primary-pick"><input type="file" accept="image/*" capture="environment" id="foodCamera" hidden>📸 지금 찍기</label>
+                <label class="pick"><input type="file" accept="image/*" id="foodFile" hidden>🖼️ 사진 선택</label>
+              </div>
+              <div class="drop" id="foodDrop">또는 음식 사진을 여기로 끌어다 놓으세요</div>
+            </div>
+            <div id="foodWork" hidden>
+              <div class="food-analyzing"><img id="foodPreview" alt="올린 음식 사진"><div class="food-scan"></div></div>
+              <p class="scan-msg" id="foodMsg">🔍 음식을 알아보는 중…</p>
+            </div>
+            <div id="foodResult" hidden></div>
+          </div>
+          <div class="my-card">
+            <div class="my-card-head"><h2>🍽️ 오늘의 식사</h2><span class="sub" id="myMealCount"></span></div>
+            <ul class="my-meals" id="myMeals"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 발표용: 냉장고 안 카메라 시뮬레이션 -->
     <section class="simcam" id="simPanel" role="tabpanel" aria-labelledby="simTab" hidden>
       <div class="sim-head">
@@ -283,11 +321,29 @@
     </div>
   </dialog>
 
+  <!-- AI 식단 상담 -->
+  <div class="chat-backdrop" id="chatBackdrop" hidden></div>
+  <aside class="chat" id="chatPanel" aria-label="AI 식단 상담" hidden>
+    <div class="chat-head">
+      <div class="chat-avatar">🥗</div>
+      <div><b>지식 AI 상담사</b><small id="chatMode"></small></div>
+      <button type="button" class="close" id="chatClose" aria-label="닫기">✕</button>
+    </div>
+    <div class="chat-msgs" id="chatMsgs" aria-live="polite"></div>
+    <div class="chat-chips" id="chatChips"></div>
+    <form class="chat-form" id="chatForm" autocomplete="off">
+      <input id="chatInput" placeholder="예) 오늘 저녁 뭐 먹지?" aria-label="메시지 입력" maxlength="500">
+      <button type="submit" class="primary" aria-label="보내기">➤</button>
+    </form>
+  </aside>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="recipes.js"></script>
   <script src="fridge3d.js"></script>
   <script src="app.js"></script>
   <script src="simcam.js"></script>
+  <script src="mypage.js"></script>
+  <script src="chat.js"></script>
 </body>
 </html>
