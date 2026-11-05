@@ -86,6 +86,7 @@
     }
 
     if (/(혈당|혈압|심박|건강|웨어러블|워치|컨디션|몸상태|산소|체온|심전도|활동)/.test(s)) {
+      if (window.JisikWear && !window.JisikWear.collected()) return { text: "오늘 건강 데이터를 아직 수집하지 않았어요. '⌚ 건강 데이터' 화면에서 **📡 건강 데이터 수집**을 누르면 측정값을 보고 맞춤 메뉴를 추천해 드려요.", actions: [{ label: "⌚ 건강 데이터 수집하러 가기", type: "tab", hash: "wearable" }] };
       const h = window.JisikHealth?.summary?.(), rc = window.JisikWear?.reco?.();
       if (!h || !rc) return { text: "웨어러블 데이터를 아직 불러오지 못했어요.", actions: [{ label: "⌚ 웨어러블 화면 열기", type: "tab", hash: "wearable" }] };
       return { text: `⌚ 지금 측정값\n` + Object.entries(h).map(([k, v]) => `- ${k}: ${v}`).join("\n") + `\n\n${rc.head}\n${rc.tip}\n\n지금 몸 상태에 맞는 추천:\n` + rc.top.map((r, i) => `${i + 1}. ${r.emoji} ${r.name} — ${r.why.join(", ")}`).join("\n"),

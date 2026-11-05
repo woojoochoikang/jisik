@@ -21,6 +21,7 @@
     </div>
     <div class="top-actions">
       <div class="today" id="todayLabel"></div>
+      <button type="button" class="cart-open" id="cartOpen" aria-controls="cartPanel">🛒 장바구니 <b id="cartCount" hidden>0</b></button>
       <button type="button" class="chat-open" id="chatOpen" aria-controls="chatPanel" aria-expanded="false">💬 AI 식단 상담</button>
     </div>
   </header>
@@ -70,7 +71,6 @@
       <div class="my-grid">
         <div class="my-col">
           <div class="my-card my-profile" id="myProfile"></div>
-          <div class="my-card" id="myHealth"></div>
           <div class="my-card" id="myToday"></div>
           <div class="my-card" id="myWeek"></div>
         </div>
@@ -329,6 +329,18 @@
     </div>
   </dialog>
 
+  <!-- 장바구니 -->
+  <div class="chat-backdrop" id="cartBackdrop" hidden></div>
+  <aside class="chat cart" id="cartPanel" aria-label="장바구니" hidden>
+    <div class="chat-head">
+      <div class="chat-avatar">🛒</div>
+      <div><b>장바구니</b><small>부족한 재료를 모아 최저가로 사고, 산 재료는 냉장고에 넣어요</small></div>
+      <button type="button" class="close" id="cartClose" aria-label="닫기">✕</button>
+    </div>
+    <ul class="cart-list" id="cartList"></ul>
+    <div class="cart-foot" id="cartFoot"></div>
+  </aside>
+
   <!-- AI 식단 상담 -->
   <div class="chat-backdrop" id="chatBackdrop" hidden></div>
   <aside class="chat" id="chatPanel" aria-label="AI 식단 상담" hidden>
@@ -358,6 +370,7 @@
   <script src="mypage.js"></script>
   <script src="chat.js"></script>
   <script src="wearable.js"></script>
+  <script src="cart.js"></script>
   <script src="briefing.js"></script>
 </body>
 </html>

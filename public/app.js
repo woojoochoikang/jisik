@@ -71,7 +71,7 @@
     return {
       demo: DEMO_VERSION, goal: "diet", goals: ["diet", "diabetes", "hypertension"], kcalTarget: 1600, proteinTarget: 90,
       profile: { name: "황성욱", nick: "황성욱", age: 25, sex: "남성", height: 176, weight: 84, targetWeight: 78, avatar: "🧑", conditions: ["고혈압", "당뇨(2형)"] },
-      fridge, history: [], daily, firstVisit: false,
+      fridge, history: [], daily, firstVisit: false, cart: [],
       log: { date: todayStr(), items: [
         { id: "meal-demo1", name: "그릭요거트 볼", emoji: "🫐", kcal: 280, protein: 20, carbs: 30, fat: 9, sodium: 70, meal: "아침", time: at(8, 10), source: "photo" },
         { id: "meal-demo2", name: "비빔밥 (밥 반 공기)", emoji: "🍲", kcal: 480, protein: 19, carbs: 62, fat: 14, sodium: 880, meal: "점심", time: at(12, 35), source: "photo" }
@@ -80,6 +80,7 @@
   }
   let state = load();
   if (!state || state.demo !== DEMO_VERSION) state = demoState();
+  state.cart = state.cart || [];
   state.daily = state.daily || [];
   // 여러 목표 동시 선택 (예: 당뇨 + 다이어트). state.goal은 첫 번째 목표(이전 버전 호환)
   if (!Array.isArray(state.goals) || !state.goals.length) state.goals = [state.goal || "balance"];
@@ -261,6 +262,25 @@
   const ddayText = d => d < 0 ? `${-d}일 지남` : d === 0 ? "오늘까지" : d <= 10 ? `D-${d}` : "기한 여유";
 
   // ---------- 렌더링: 추천 ----------
+  // ---------- 장바구니 ----------
+  function addToCart(items, auto = false) {
+    let n = 0;
+    items.forEach(it => {
+      const ex = state.cart.find(c => sameIng(c.name, it.name));
+      if (ex) { if (it.recipe && !ex.recipes.includes(it.recipe)) ex.recipes.push(it.recipe); return; }
+      state.cart.push({ id: uid(), name: it.name, amount: it.amount || "", recipes: it.recipe ? [it.recipe] : [], auto, added: Date.now(), done: false });
+      n++;
+    });
+    if (n || items.length) save();
+    return n;
+  }
+  // 추천 상위 메뉴 중 재료가 1~2개만 부족한 메뉴의 부족 재료 (브리핑에서 자동 담기)
+  function missingForTop(maxRecipes = 3) {
+    return RECIPES.map(analyze).sort((a, b) => b.score - a.score).slice(0, 10)
+      .filter(x => x.missing.length >= 1 && x.missing.length <= 2).slice(0, maxRecipes)
+      .map(x => ({ id: x.r.id, name: x.r.name, emoji: x.r.emoji, missing: x.missing.map(m => ({ name: m.n, amount: m.a })) }));
+  }
+
   let ingFilter = null; // 냉장고에서 고른 재료로 추천 좁히기
   const usesIng = (r, name) => r.ingredients.some(i => !isPantry(i.n) && sameIng(i.n, name));
   function setIngFilter(name, scroll) {
@@ -487,7 +507,7 @@
   function renderShop(need) {
     const box = $("#mShop");
     if (!need.length) { box.innerHTML = ""; return; }
-    box.innerHTML = `<div class="box">🛒 <b>장보기 목록</b><br>${need.map(x => `${esc(x.n)} ${esc(x.a)}${x.opt ? " (선택)" : ""}`).join(", ")}<br><button class="ghost small" id="copyShop" style="margin-top:8px">목록 복사</button></div>
+    box.innerHTML = `<div class="box">🛒 <b>장보기 목록</b><br>${need.map(x => `${esc(x.n)} ${esc(x.a)}${x.opt ? " (선택)" : ""}`).join(", ")}<br><button class="ghost small" id="copyShop" style="margin-top:8px">목록 복사</button> <button class="primary small" id="cartShop" style="margin-top:8px">🛒 장바구니에 담기</button></div>
       <div class="price-wrap">
         <div class="price-head"><h4>💸 최저가로 사기</h4><span class="total" id="shopTotal"></span></div>
         ${need.map((x, i) => `<details class="pitem" data-q="${esc(term(x.n))}" ${i === 0 ? "open" : ""}>
@@ -803,6 +823,11 @@
     document.querySelectorAll(".seg").forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
     $("#doneBtn").addEventListener("click", finishCooking);
     $("#mShop").addEventListener("click", e => {
+      if (e.target.id === "cartShop") {
+        const n = addToCart(cur.rows.filter(x => x.status === "miss").map(x => ({ name: x.n, amount: x.a, recipe: cur.r.name })));
+        toast(n ? `🛒 ${n}개 재료를 장바구니에 담았어요` : "이미 장바구니에 있어요");
+        return;
+      }
       if (e.target.id !== "copyShop") return;
       const txt = cur.rows.filter(x => x.status === "miss" || x.status === "optmiss").map(x => `- ${x.n} ${x.a}`).join("\n");
       navigator.clipboard?.writeText(`[${cur.r.name}] 장보기\n${txt}`).then(() => toast("📋 장보기 목록을 복사했어요"), () => toast("복사할 수 없어요"));
@@ -840,6 +865,14 @@
       .map(x => ({ id: x.r.id, name: x.r.name, emoji: x.r.emoji, kcal: x.r.kcal, protein: x.r.protein, carbs: x.r.carbs, fat: x.r.fat, sugar: x.r.sugar, sodium: x.r.sodium,
         tags: x.r.tags, time: x.r.time, score: x.score, missing: x.missing.map(m => m.n), urgent: x.urgent.map(u => u.n), good: x.fit.good, bad: x.fit.bad })),
     recipes: () => RECIPES,
+    addToCart, missingForTop,
+    getCart: () => state.cart.map(c => ({ ...c })),
+    removeFromCart: id => { state.cart = state.cart.filter(c => c.id !== id); save(); },
+    toggleCart: id => { const c = state.cart.find(x => x.id === id); if (c) { c.done = !c.done; save(); } },
+    clearCart: () => { state.cart = []; save(); },
+    autoCartDone: () => state.cartAutoDate === todayStr(),
+    markAutoCart: () => { state.cartAutoDate = todayStr(); save(); },
+    mallLinks: name => MALLS.map(([label, f]) => ({ label, url: f(term(name)) })),
     resetDemo: () => { try { localStorage.removeItem(KEY); localStorage.removeItem("jisik.health.v1"); } catch { /* 무시 */ } location.hash = "my"; location.reload(); },
     openRecipe: id => openRecipe(id)
   };

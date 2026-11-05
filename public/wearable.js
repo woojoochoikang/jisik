@@ -16,6 +16,7 @@
   const AUTO = ["postmeal", "normal", "highbp", "exercise", "hypo", "fever", "normal"];
   const fmt = (k, v) => k === "temp" ? (+v).toFixed(1) : k === "steps" ? Math.round(v).toLocaleString() : Math.round(v);
   const hhmm = d => `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  let collected = false, measuring = false; // '건강 데이터 수집' 버튼을 눌러야 데이터가 보임
   let openKey = null, autoTimer = null, autoIdx = 0, lastKey = "", lastTop = null, changedAt = 0;
 
   // ---------- 화면 뼈대 ----------
@@ -23,16 +24,18 @@
     <div class="sim-head">
       <div>
         <span class="sim-eyebrow">WEARABLE HEALTH · 시연용 가상 데이터</span>
-        <h1>⌚ 웨어러블 건강 데이터</h1>
+        <h1>⌚건강 데이터</h1>
         <p>황성욱님의 스마트워치·연속혈당측정기 데이터를 <b>개인 기준 범위</b>로 판정해요. <b>항목을 누르면</b> 시간대별 그래프와 기준 설정이 열려요.</p>
       </div>
       <div class="wear-live">
-        <span class="live"><i></i>실시간 수신 중</span>
+        <span class="live" id="wLive" hidden><i></i>실시간 수신 중</span>
         <span class="dev">⌚ 스마트워치 연결됨</span><span class="dev">🩸 CGM 연결됨</span>
+        <button type="button" class="primary collect-btn" id="wCollect">📡 건강 데이터 수집</button>
       </div>
     </div>
     <div class="wear-legend"><span class="lv lv-ok">✅ 안정 · 목표 범위 안</span><span class="lv lv-warn">⚠️ 주의 · 범위에 근접하거나 벗어남</span><span class="lv lv-bad">🚨 확인 필요 · 위험 기준을 크게 벗어남</span></div>
     <div class="wgrid" id="wGrid"></div>
+    <div class="measuring" id="wMeasure" hidden role="status" aria-live="assertive"></div>
     <div class="wear-scen">
       <b>🎬 상황 시뮬레이션</b>
       <div class="scen-btns" id="wScen"></div>
@@ -143,7 +146,43 @@
   }
 
   // ---------- 그리기 ----------
+  function renderEmpty() {
+    $("wGrid").innerHTML = ORDER.map(mk => { const m = H.METRICS[mk]; return `
+      <div class="wcard empty ${mk === "ecg" ? "wide" : ""}">
+        <div class="wc-top"><span class="wc-name">${m.icon} ${m.name}</span><span class="lv lv-none">수집 전</span></div>
+        <div class="wc-val"><b>--</b><em>${mk === "bp" ? "mmHg" : mk === "act" ? "걸음" : mk === "ecg" ? "" : m.unit}</em></div>
+        <div class="wc-range">${rangeText(mk)}</div>
+      </div>`; }).join("");
+    $("wScen").innerHTML = Object.values(H.SCEN).map(s => `<button type="button" disabled>${s.label}</button>`).join("");
+    $("wearReco").innerHTML = `<div class="collect-hint"><span>📡</span><div><b>아직 오늘의 건강 데이터를 수집하지 않았어요</b><p>위의 <b>건강 데이터 수집</b> 버튼을 누르면 스마트워치와 혈당 센서에서 측정값을 받아와 상태를 판정하고 식단을 추천해요.</p></div><button type="button" class="primary" data-collect>📡 지금 수집하기</button></div>`;
+  }
+
+  // 측정 중 화면 (약 1.6초) → 수집 완료
+  const STEPS = ["⌚ 스마트워치 연결 확인", "💓 심박·혈압·산소포화도 측정", "📈 심전도 파형 기록", "🩸 연속혈당 데이터 동기화", "🌡️ 체온·활동량 정리"];
+  function collect() {
+    if (measuring) return Promise.resolve();
+    measuring = true;
+    const box = $("wMeasure"), btn = $("wCollect");
+    btn.disabled = true; btn.textContent = "⏳ 측정 중…";
+    box.innerHTML = `<div class="m-card"><div class="m-ring"><span>⌚</span></div><b>건강 데이터 측정 중…</b>
+      <ul>${STEPS.map((t, i) => `<li style="--d:${i * 0.3}s"><i></i>${t}</li>`).join("")}</ul><div class="m-bar"><span></span></div></div>`;
+    box.hidden = false; requestAnimationFrame(() => box.classList.add("show"));
+    return new Promise(res => setTimeout(() => {
+      box.classList.remove("show");
+      setTimeout(() => { box.hidden = true; }, 250);
+      collected = true; measuring = false;
+      btn.disabled = false; btn.textContent = "🔄 다시 측정";
+      $("wLive").hidden = false;
+      lastKey = ""; render();
+      $("wGrid").classList.add("fresh"); setTimeout(() => $("wGrid").classList.remove("fresh"), 900);
+      log("ok", `✅ 건강 데이터 수집 완료 — 7개 항목 (${new Date().toTimeString().slice(0, 5)})`);
+      toast("✅ 건강 데이터 수집 완료");
+      res();
+    }, 1700));
+  }
+
   function render() {
+    if (!collected) { renderEmpty(); return; }
     $("wGrid").innerHTML = ORDER.map(card).join("");
     $("wScen").innerHTML = Object.entries(H.SCEN).map(([k, s]) => `<button type="button" data-scen="${k}" class="${H.scenario() === k ? "on" : ""}">${s.label}</button>`).join("");
     const rc = reco();
@@ -299,10 +338,13 @@
 
   // ---------- 이벤트 ----------
   $("wGrid").addEventListener("click", e => { const b = e.target.closest("[data-m]"); if (b) openDetail(b.dataset.m); });
+  $("wCollect").addEventListener("click", collect);
+  $("wearReco").addEventListener("click", e => { if (e.target.closest("[data-collect]")) collect(); });
   $("wScen").addEventListener("click", e => { const b = e.target.closest("[data-scen]"); if (!b) return; stopAuto(); H.setScenario(b.dataset.scen); toast(`${H.SCEN[b.dataset.scen].label} 상황을 시뮬레이션해요`); });
   $("wAuto").addEventListener("click", () => autoTimer ? stopAuto() : startAuto());
   $("wearReco").addEventListener("click", e => { const b = e.target.closest("[data-recipe]"); if (b) App.openRecipe(b.dataset.recipe); });
   function startAuto() {
+    if (!collected) { toast("먼저 건강 데이터를 수집해 주세요"); return; }
     $("wAuto").textContent = "■ 멈춤"; $("wAuto").classList.add("running");
     autoIdx = 0; H.setScenario(AUTO[0]);
     autoTimer = setInterval(() => { autoIdx = (autoIdx + 1) % AUTO.length; H.setScenario(AUTO[autoIdx]); }, 8000);
@@ -350,6 +392,9 @@
   window.addEventListener("jisik:health", render);
   window.addEventListener("jisik:change", render);
 
-  window.JisikWear = { open: openDetail, reco };
+  window.JisikWear = {
+    open: mk => collected ? openDetail(mk) : collect().then(() => openDetail(mk)),
+    reco, collected: () => collected
+  };
   render();
 })();

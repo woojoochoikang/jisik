@@ -311,7 +311,7 @@
       if (e.target.id === "myBriefing") window.JisikBriefing?.show();
       if (e.target.id === "myReset") { if (e.target.dataset.armed) App.resetDemo(); else { e.target.dataset.armed = "1"; e.target.textContent = "한 번 더 누르면 초기화"; } }
     });
-    $("myHealth").addEventListener("click", e => {
+    $("myHealth")?.addEventListener("click", e => {
       const b = e.target.closest("[data-m]"); if (!b) return;
       location.hash = "wearable";
       setTimeout(() => window.JisikWear?.open(b.dataset.m), 150);
