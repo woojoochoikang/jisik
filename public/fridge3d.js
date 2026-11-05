@@ -67,22 +67,32 @@
     const food = e.target.closest('[data-food]');
     if (food) { select(food.dataset.food); return; }
   });
-  const tabs = [$('mealTab'), $('fridgeTab')];
-  function showTab(fridge, focus = false) {
-    tabs.forEach((tab, i) => { const active = fridge === (i === 1); tab.setAttribute('aria-selected', String(active)); tab.tabIndex = active ? 0 : -1; if (active && focus) tab.focus(); });
-    $('mealPanel').hidden = fridge; $('fridgePanel').hidden = !fridge;
+  // 탭: [탭 버튼 id, 패널 id, 주소 해시] — 탭을 추가하려면 여기에 한 줄만 추가
+  const TABS = [['mealTab', 'mealPanel', 'meals'], ['fridgeTab', 'fridgePanel', 'fridge'], ['simTab', 'simPanel', 'camera']]
+    .filter(([t, p]) => $(t) && $(p));
+  function showTab(index, focus = false) {
+    TABS.forEach(([t, p], i) => {
+      const active = i === index, tab = $(t);
+      tab.setAttribute('aria-selected', String(active)); tab.tabIndex = active ? 0 : -1;
+      if (active && focus) tab.focus();
+      $(p).hidden = !active;
+    });
+    window.dispatchEvent(new CustomEvent('jisik:tab', { detail: TABS[index][2] }));
   }
-  tabs.forEach((tab, i) => {
-    tab.addEventListener('click', () => { location.hash = i ? 'fridge' : 'meals'; showTab(i === 1); });
-    tab.addEventListener('keydown', e => {
+  const go = (i, focus) => { location.hash = TABS[i][2]; showTab(i, focus); };
+  TABS.forEach(([t], i) => {
+    $(t).addEventListener('click', () => go(i));
+    $(t).addEventListener('keydown', e => {
       if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
-      e.preventDefault(); const fridge = e.key === 'Home' ? false : e.key === 'End' ? true : i === 0;
-      location.hash = fridge ? 'fridge' : 'meals'; showTab(fridge, true);
+      e.preventDefault();
+      const n = TABS.length;
+      const next = e.key === 'Home' ? 0 : e.key === 'End' ? n - 1 : e.key === 'ArrowRight' ? (i + 1) % n : (i - 1 + n) % n;
+      go(next, true);
     });
   });
-  function syncTab() { showTab(location.hash === '#fridge'); }
+  function syncTab() { const i = TABS.findIndex(([, , h]) => '#' + h === location.hash); showTab(i < 0 ? 0 : i); }
   window.addEventListener('hashchange', syncTab); syncTab();
-  document.querySelector('.fridge-add-link').addEventListener('click', () => showTab(false));
+  document.querySelector('.fridge-add-link').addEventListener('click', () => showTab(0));
   $('fridgeDoorToggle').addEventListener('click', () => {
     open = !open; $('fridgeDoor').classList.toggle('closed', !open);
     $('fridgeDoorToggle').textContent = open ? '문 닫기' : '문 열기'; $('fridgeDoorToggle').setAttribute('aria-expanded', String(open));

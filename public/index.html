@@ -8,6 +8,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥗</text></svg>">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="fridge3d.css">
+  <link rel="stylesheet" href="simcam.css">
 </head>
 <body>
   <header class="topbar">
@@ -21,6 +22,7 @@
   <nav class="app-tabs" role="tablist" aria-label="주요 화면">
     <button type="button" role="tab" id="mealTab" aria-controls="mealPanel" aria-selected="true" tabindex="0">🍳 오늘의 식단</button>
     <button type="button" role="tab" id="fridgeTab" aria-controls="fridgePanel" aria-selected="false" tabindex="-1">🧊 내 냉장고를 한눈에</button>
+    <button type="button" role="tab" id="simTab" aria-controls="simPanel" aria-selected="false" tabindex="-1">📹 냉장고 카메라 시연</button>
   </nav>
   <main class="layout">
     <section class="fridge-studio" id="fridgePanel" role="tabpanel" aria-labelledby="fridgeTab" hidden>
@@ -52,6 +54,66 @@
         </aside>
       </div>
     </section>
+    <!-- 발표용: 냉장고 안 카메라 시뮬레이션 -->
+    <section class="simcam" id="simPanel" role="tabpanel" aria-labelledby="simTab" hidden>
+      <div class="sim-head">
+        <div>
+          <span class="sim-eyebrow">PRESENTATION DEMO · SMART FRIDGE CAM</span>
+          <h1>냉장고 속 카메라 시뮬레이션</h1>
+          <p>냉장고 천장에 달린 카메라가 넣은 재료를 알아보고, 앱에 <b>실시간으로 등록</b>하는 과정을 재현해요.</p>
+        </div>
+        <div class="sim-head-btns">
+          <button type="button" class="primary" id="simAuto">▶ 자동 시연</button>
+          <button type="button" class="ghost" id="simReset">🧹 냉장고 비우기</button>
+        </div>
+      </div>
+
+      <div class="sim-body">
+        <div class="cam-col">
+          <div class="cam" id="simCam" aria-label="냉장고 내부 카메라 화면. 오른쪽 재료를 끌어다 놓거나 눌러서 넣을 수 있어요.">
+            <div class="cam-scene" id="simScene">
+              <div class="cam-light"></div>
+              <div id="simShelves"></div>
+              <div id="simItems"></div>
+              <div id="simPending"></div>
+            </div>
+            <div class="cam-vignette"></div>
+            <div class="cam-hud">
+              <span class="hud tl"><i class="rec"></i>REC · CAM-01 냉장실 천장 광각</span>
+              <span class="hud tr" id="simClock"></span>
+              <span class="hud bl" id="simCount">AI 인식 ON</span>
+              <span class="hud br">🌡 3.2℃ · 문 열림 감지</span>
+            </div>
+            <div class="cam-drop-hint">여기에 놓으면 그 칸에 들어가요</div>
+            <div class="cam-status" id="simStatus" aria-live="polite"></div>
+          </div>
+          <div class="cam-controls">
+            <label class="toggle"><input type="checkbox" id="simBoxes" checked> 인식 박스 표시</label>
+            <label class="toggle"><input type="checkbox" id="simSound" checked> 효과음</label>
+            <span class="cam-tip">💡 재료를 카메라 화면에 끌어다 놓으면 원하는 칸에, 누르면 알맞은 칸에 들어가요. 화면 속 재료를 누르면 꺼낼 수 있어요.</span>
+          </div>
+        </div>
+
+        <aside class="sim-side">
+          <div class="sim-card">
+            <h2>🛍️ 장바구니에서 꺼내 넣기</h2>
+            <div class="tray" id="simTray"></div>
+          </div>
+          <div class="sim-card sync">
+            <h2>⚡ 실시간 반영</h2>
+            <div class="sync-flow">
+              <span>📹 카메라 인식</span><i>→</i><span>🧊 내 냉장고</span><i>→</i><span>🍳 추천 레시피</span>
+            </div>
+            <div class="sim-top" id="simTop"></div>
+          </div>
+          <div class="sim-card">
+            <h2>📋 인식 기록</h2>
+            <ol class="sim-log" id="simLog"><li class="empty-log">아직 기록이 없어요. 재료를 넣어보세요!</li></ol>
+          </div>
+        </aside>
+      </div>
+    </section>
+
     <div class="meal-panel" id="mealPanel" role="tabpanel" aria-labelledby="mealTab">
     <!-- 왼쪽: 목표 + 냉장고 -->
     <aside class="side">
@@ -226,5 +288,6 @@
   <script src="recipes.js"></script>
   <script src="fridge3d.js"></script>
   <script src="app.js"></script>
+  <script src="simcam.js"></script>
 </body>
 </html>

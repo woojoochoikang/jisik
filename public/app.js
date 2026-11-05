@@ -44,7 +44,11 @@
   // ---------- 저장소 ----------
   const KEY = "jisik.v1";
   const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch { return null; } };
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* 저장 불가 환경 */ } };
+  const save = () => {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* 저장 불가 환경 */ }
+    // 다른 화면(카메라 시뮬레이션 등)이 실시간으로 따라 그릴 수 있게 알림
+    window.dispatchEvent(new CustomEvent("jisik:change"));
+  };
 
   const todayStr = () => fmt(new Date());
   function fmt(d) { const z = n => String(n).padStart(2, "0"); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`; }
@@ -188,13 +192,25 @@
     $("#fridgeEmpty").hidden = list.length > 0;
     $("#quickAdd").innerHTML = QUICK.map(n => `<button data-quick="${n}">${EMOJI[n] || ""} ${n}</button>`).join("");
   }
-  function addItem(name, exp) {
-    name = name.trim(); if (!name) return;
+  function addItem(name, exp, opts = {}) {
+    name = name.trim(); if (!name) return null;
     const n = norm(name);
     if (!exp) exp = addDays(SHELF_DAYS[n] ?? 7);
-    state.fridge.push({ id: uid(), name, exp });
+    const item = { id: uid(), name, exp };
+    if (opts.location) item.location = opts.location;
+    state.fridge.push(item);
     save(); renderFridge(); renderRecs();
-    toast(`${emojiOf(name)} ${name} 추가 (${ddayText(dday(exp))})`);
+    if (!opts.silent) toast(`${emojiOf(name)} ${name} 추가 (${ddayText(dday(exp))})`);
+    return item;
+  }
+  function removeItem(id) {
+    const before = state.fridge.length;
+    state.fridge = state.fridge.filter(f => f.id !== id);
+    if (state.fridge.length !== before) { save(); renderFridge(); renderRecs(); }
+  }
+  function topRecipe() {
+    const best = RECIPES.map(analyze).sort((a, b) => b.score - a.score)[0];
+    return best ? { id: best.r.id, name: best.r.name, emoji: best.r.emoji, missing: best.missing.length, urgent: best.urgent.map(u => u.n) } : null;
   }
   const ddayText = d => d < 0 ? `${-d}일 지남` : d === 0 ? "오늘까지" : d <= 10 ? `D-${d}` : "기한 여유";
 
@@ -719,4 +735,12 @@
   fetch("/api/status").then(r => r.ok ? r.json() : {}).then(f => { features = { ...features, ...f }; }).catch(() => {});
   if (state.firstVisit) { state.firstVisit = false; fillSample(); }
   renderGoal(); renderFridge(); renderRecs();
+
+  // 다른 스크립트(카메라 시뮬레이션)에서 쓰는 공개 API
+  window.JisikApp = {
+    addItem, removeItem, topRecipe, emojiOf, norm, dday, addDays,
+    getFridge: () => state.fridge.map(f => ({ ...f })),
+    clearFridge: () => { state.fridge = []; save(); renderFridge(); renderRecs(); },
+    openRecipe: id => openRecipe(id)
+  };
 })();

@@ -1,0 +1,228 @@
+/* 📹 냉장고 카메라 시뮬레이션 (발표용) */
+.simcam {
+  grid-column: 1 / -1;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 24px;
+  padding: 28px; box-shadow: var(--shadow);
+}
+.sim-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.sim-eyebrow { font-size: .72rem; font-weight: 800; letter-spacing: .12em; color: var(--brand); }
+.sim-head h1 { font-size: 1.7rem; margin: 4px 0; letter-spacing: -.02em; }
+.sim-head p { margin: 0; color: var(--muted); }
+.sim-head-btns { display: flex; gap: 8px; }
+.sim-head-btns button { padding: 11px 16px; }
+#simAuto.running { background: var(--danger); }
+#simReset.confirm { background: var(--danger-bg); color: var(--danger); font-weight: 700; }
+
+.sim-body { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+
+/* ---------- 카메라 화면 ---------- */
+.cam {
+  position: relative; aspect-ratio: 16 / 10.5; border-radius: 22px; overflow: hidden;
+  background: #0b0f12; container-type: inline-size; user-select: none;
+  box-shadow: 0 0 0 6px #1a1f24, 0 0 0 7px #2c333a, 0 20px 50px rgba(0, 0, 0, .35);
+}
+.cam-scene {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 55% at 50% 42%, #ffffff 0%, #eef5f9 45%, #cfdde6 80%, #a9bccb 100%);
+  filter: saturate(.9) contrast(1.02);
+}
+/* 냉장고 안쪽 LED 조명 */
+.cam-light {
+  position: absolute; left: 22%; right: 22%; top: 0; height: 3.2%;
+  background: linear-gradient(#fff, #e9f6ff); border-radius: 0 0 40% 40%;
+  box-shadow: 0 0 40px 18px rgba(220, 240, 255, .9);
+}
+/* 옆 벽 (원근감) */
+.cam-scene::before, .cam-scene::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 13%;
+  background: linear-gradient(90deg, #b9cad6, #dfe9ef);
+}
+.cam-scene::before { left: 0; clip-path: polygon(0 0, 100% 7%, 100% 93%, 0 100%); }
+.cam-scene::after { right: 0; transform: scaleX(-1); clip-path: polygon(0 0, 100% 7%, 100% 93%, 0 100%); }
+
+/* 선반: 앞쪽은 넓고 뒤쪽은 좁은 사다리꼴 유리판 */
+.sim-shelf { position: absolute; left: 0; right: 0; pointer-events: none; }
+.sim-shelf .glass {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 34%;
+  background: linear-gradient(180deg, rgba(190, 220, 236, .35), rgba(170, 205, 226, .7));
+  clip-path: polygon(13% 0, 87% 0, 100% 100%, 0 100%);
+}
+.sim-shelf .edge {
+  position: absolute; left: 0; right: 0; bottom: -1.6%; height: 5%;
+  background: linear-gradient(#f7fbfd, #c4d3dd); box-shadow: 0 3px 6px rgba(40, 70, 90, .25);
+}
+.sim-shelf .lbl {
+  position: absolute; left: 1.4%; bottom: 7%; z-index: 1;
+  font: 700 1.5cqw/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: #5b7383; background: rgba(255, 255, 255, .7); padding: .35cqw .6cqw; border-radius: .5cqw;
+}
+.sim-shelf.veg .glass { background: linear-gradient(180deg, rgba(200, 235, 210, .45), rgba(160, 210, 180, .75)); }
+
+.slot-hl {
+  position: absolute; border: 2px dashed #22a35a; background: rgba(46, 180, 100, .14);
+  border-radius: 1cqw; pointer-events: none; transition: all .12s;
+}
+
+/* ---------- 재료 ---------- */
+.cam-item {
+  position: absolute; left: var(--x); top: var(--y); z-index: var(--z);
+  transform: translate(-50%, -100%) scale(var(--s));
+  transform-origin: 50% 100%;
+  background: none; border: 0; padding: 0; cursor: pointer; border-radius: 0;
+  transition: left .5s, top .5s, transform .3s;
+}
+.cam-item:active { transform: translate(-50%, -100%) scale(var(--s)); }
+.cam-item .obj {
+  display: block; font-size: 5.8cqw; line-height: 1;
+  filter: drop-shadow(0 .5cqw .45cqw rgba(30, 50, 60, .35));
+}
+.cam-item .box {
+  position: absolute; inset: -12% -16% -6%; border: 2px solid #2bd46f; border-radius: .6cqw;
+  opacity: 0; transition: opacity .25s; pointer-events: none;
+}
+.show-boxes .cam-item .box { opacity: 1; }
+.cam-item .box b {
+  position: absolute; left: -2px; bottom: 100%; white-space: nowrap;
+  font: 700 1.35cqw/1.3 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #2bd46f; color: #04220f; padding: .15cqw .5cqw; border-radius: .4cqw .4cqw .4cqw 0;
+}
+/* 앞줄 이름표는 상자 아래쪽에 달아 뒷줄 이름표와 겹치지 않게 */
+.cam-item.front .box b { bottom: auto; top: 100%; border-radius: 0 .4cqw .4cqw .4cqw; }
+.cam-item.soon .box { border-color: #ffae1a; }
+.cam-item.soon .box b { background: #ffae1a; color: #3a2400; }
+.cam-item.expired .box { border-color: #ff4d6d; }
+.cam-item.expired .box b { background: #ff4d6d; color: #fff; }
+.cam-item.sel .box { opacity: 1; border-width: 3px; box-shadow: 0 0 0 3px rgba(255, 255, 255, .7); }
+.cam-item.fresh .box { opacity: 1; animation: boxFlash 1.6s ease-out; }
+.cam-item.fresh .obj { animation: settle .6s ease-out; }
+@keyframes boxFlash { 0% { box-shadow: 0 0 0 0 rgba(43, 212, 111, .9); } 100% { box-shadow: 0 0 0 2.4cqw rgba(43, 212, 111, 0); } }
+@keyframes settle { 0% { transform: translateY(-6%) scale(1.08); } 60% { transform: translateY(1%) scale(.98); } 100% { transform: none; } }
+.cam-item.leaving { animation: takeOut .7s ease-in forwards; pointer-events: none; }
+@keyframes takeOut { to { transform: translate(-50%, 40%) scale(2.2) rotate(10deg); opacity: 0; } }
+
+.take-out {
+  position: absolute; left: 50%; bottom: calc(100% + 2.6cqw); transform: translateX(-50%) scale(calc(1 / var(--s)));
+  transform-origin: 50% 100%; white-space: nowrap;
+  background: #111; color: #fff; font-size: 1.5cqw; font-weight: 700; padding: .6cqw 1.1cqw; border-radius: 99px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+}
+
+/* 넣는 중인 재료 (손에서 선반으로) */
+.pending-item { position: absolute; left: var(--x); top: var(--y); z-index: 50; transform-origin: 50% 100%; pointer-events: none;
+  animation: putIn .9s cubic-bezier(.2, .8, .25, 1) both; transform: translate(-50%, -100%) scale(var(--s)); }
+.pending-item .obj { display: block; font-size: 5.8cqw; line-height: 1; filter: drop-shadow(0 .5cqw .45cqw rgba(30, 50, 60, .35)); }
+.pending-item .hand { position: absolute; left: 55%; top: 35%; font-size: 4.6cqw; animation: handAway .9s ease-in both; }
+@keyframes putIn {
+  0% { transform: translate(-50%, 70%) scale(calc(var(--s) * 2.4)) rotate(-12deg); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: translate(-50%, -100%) scale(var(--s)); }
+}
+@keyframes handAway { 0%, 70% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translate(40%, 80%); } }
+.pending-item .scan {
+  position: absolute; inset: -12% -16% -6%; border: 2px solid #2bd46f; border-radius: .6cqw; opacity: 0; overflow: hidden;
+}
+.pending-item.scanning .scan { opacity: 1; animation: scanPulse .5s ease-in-out infinite alternate; }
+.pending-item.scanning .hand { display: none; }
+.pending-item .scan::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 22%;
+  background: linear-gradient(transparent, rgba(43, 212, 111, .55), transparent);
+  animation: scanLine .9s linear infinite;
+}
+.pending-item .scan b {
+  position: absolute; left: -2px; top: -1.9cqw; white-space: nowrap;
+  font: 700 1.35cqw/1.3 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: #2bd46f; color: #04220f; padding: .15cqw .5cqw; border-radius: .4cqw;
+}
+@keyframes scanLine { from { top: -22%; } to { top: 100%; } }
+@keyframes scanPulse { from { box-shadow: 0 0 0 0 rgba(43, 212, 111, .5); } to { box-shadow: 0 0 0 .8cqw rgba(43, 212, 111, 0); } }
+
+/* ---------- 카메라 효과 ---------- */
+.cam-vignette {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 75% 70% at 50% 50%, transparent 55%, rgba(0, 0, 0, .55) 100%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, .035) 0 1px, transparent 1px 3px);
+  box-shadow: inset 0 0 6cqw rgba(0, 0, 0, .35);
+}
+.cam-hud { position: absolute; inset: 0; pointer-events: none; font: 600 1.45cqw/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, .8); }
+.hud { position: absolute; background: rgba(0, 0, 0, .38); padding: .7cqw 1cqw; border-radius: .6cqw; display: flex; align-items: center; gap: .7cqw; }
+.hud.tl { left: 2cqw; top: 2cqw; } .hud.tr { right: 2cqw; top: 2cqw; }
+.hud.bl { left: 2cqw; bottom: 2cqw; } .hud.br { right: 2cqw; bottom: 2cqw; }
+.rec { width: 1.2cqw; height: 1.2cqw; border-radius: 50%; background: #ff3b30; animation: blink 1.2s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.hud.bl.hot { background: rgba(43, 180, 100, .75); }
+
+.cam-status {
+  position: absolute; left: 50%; top: 2cqw; transform: translate(-50%, -12px); opacity: 0;
+  background: rgba(10, 14, 18, .82); color: #fff; padding: 1.1cqw 2cqw; border-radius: 99px;
+  font-size: max(13px, 1.8cqw); font-weight: 700; white-space: nowrap; transition: all .3s; pointer-events: none; z-index: 60;
+}
+.cam-status.show { opacity: 1; transform: translate(-50%, 0); }
+.cam-status.ok { background: rgba(26, 140, 74, .92); }
+.cam-status.out { background: rgba(200, 60, 80, .9); }
+
+.cam-drop-hint {
+  position: absolute; inset: 3cqw; border: 3px dashed rgba(43, 212, 111, .9); border-radius: 2cqw;
+  display: flex; align-items: flex-start; justify-content: center; padding-top: 7cqw;
+  color: #0b5e30; font-weight: 800; font-size: 2cqw; opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.cam.dragging .cam-drop-hint { opacity: 1; }
+
+.cam-controls { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+.cam-tip { font-size: .82rem; color: var(--muted); flex: 1 1 260px; }
+
+/* ---------- 오른쪽 패널 ---------- */
+.sim-side { display: flex; flex-direction: column; gap: 14px; }
+.sim-card { background: var(--surface-2); border-radius: 18px; padding: 16px; }
+.sim-card h2 { font-size: .98rem; margin: 0 0 10px; }
+.tray { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.tray button {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 2px 6px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: .74rem; cursor: grab;
+}
+.tray button span { font-size: 1.7rem; line-height: 1.1; }
+.tray button:hover { border-color: var(--brand); background: var(--brand-2); }
+.tray button:disabled { opacity: .5; cursor: wait; }
+.sync-flow { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; font-size: .78rem; }
+.sync-flow span { background: var(--surface); border: 1px solid var(--line); padding: 4px 8px; border-radius: 99px; font-weight: 700; }
+.sync-flow i { color: var(--muted); font-style: normal; }
+.sync-flow.pulse span { animation: chipPulse .9s ease-out; }
+.sync-flow.pulse span:nth-of-type(2) { animation-delay: .15s; }
+.sync-flow.pulse span:nth-of-type(3) { animation-delay: .3s; }
+@keyframes chipPulse { 0% { background: var(--brand); color: #fff; border-color: var(--brand); } 100% { } }
+.sim-top { margin-top: 12px; background: var(--surface); border-radius: 14px; padding: 12px; display: flex; gap: 10px; align-items: center; }
+.sim-top .em { font-size: 2rem; }
+.sim-top small { display: block; color: var(--muted); font-size: .74rem; }
+.sim-top b { display: block; }
+.sim-top .why { font-size: .76rem; color: var(--warn); font-weight: 700; }
+.sim-top button { margin-left: auto; white-space: nowrap; }
+.sim-top.changed { animation: topChanged 1.4s ease-out; }
+@keyframes topChanged { 0% { box-shadow: 0 0 0 3px var(--accent); } 100% { box-shadow: 0 0 0 0 transparent; } }
+.sim-top .new { background: var(--accent); color: #fff; font-size: .68rem; padding: 1px 6px; border-radius: 99px; margin-left: 4px; vertical-align: 1px; }
+
+.sim-log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow: auto; }
+.sim-log li { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; background: var(--surface); border-radius: 10px; padding: 7px 10px; font-size: .82rem; animation: logIn .35s ease-out; }
+.sim-log li time { grid-row: span 2; font: 600 .72rem/1.6 ui-monospace, Menlo, Consolas, monospace; color: var(--muted); }
+.sim-log li small { color: var(--muted); font-size: .74rem; }
+.sim-log li.out { border-left: 3px solid var(--danger); }
+.sim-log li.in { border-left: 3px solid var(--ok); }
+.sim-log .empty-log { display: block; color: var(--muted); text-align: center; border: 0; }
+@keyframes logIn { from { opacity: 0; transform: translateY(-6px); } }
+
+@media (max-width: 1060px) { .sim-body { grid-template-columns: 1fr; } }
+@media (max-width: 700px) {
+  .simcam { padding: 18px 14px; border-radius: 18px; }
+  .sim-head h1 { font-size: 1.3rem; }
+  .app-tabs { overflow-x: auto; }
+  .app-tabs [role=tab] { white-space: nowrap; flex-shrink: 0; }
+  .hud.br { display: none; }
+  .cam { border-radius: 14px; }
+}
+
+.sim-drawer {
+  position: absolute; left: 3%; right: 3%; top: 93%; bottom: -2%;
+  background: linear-gradient(180deg, rgba(200, 235, 215, .75), rgba(150, 200, 175, .9));
+  border-radius: 1cqw 1cqw 0 0; box-shadow: inset 0 2px 0 rgba(255, 255, 255, .8);
+  display: flex; justify-content: center; padding-top: .6cqw;
+}
+.sim-drawer span { font: 700 1.3cqw/1 ui-monospace, Menlo, Consolas, monospace; color: #3f6f55; opacity: .8; }
