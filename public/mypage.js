@@ -57,13 +57,27 @@
     while (days.has(fmtDate(d))) { streak++; d.setDate(d.getDate() - 1); }
     const hit = st.daily.filter(x => x.kcal && Math.abs(x.kcal - st.kcalTarget) <= st.kcalTarget * 0.1).length;
 
+    const bmi = prof.height && prof.weight ? (prof.weight / (prof.height / 100) ** 2).toFixed(1) : null;
+    const name = prof.name || prof.nick;
     $("myProfile").innerHTML = `
-      <button type="button" class="avatar" id="myAvatar" title="눌러서 바꾸기">${prof.avatar}</button>
-      <div class="who">
-        <input id="myNick" value="${esc(prof.nick)}" maxlength="12" aria-label="닉네임">
-        <span class="goal-line">${g.label} · 하루 ${st.kcalTarget}kcal · 단백질 ${st.proteinTarget}g <a href="#meals">목표 바꾸기</a></span>
-        <div class="my-badges"><span>🔥 ${streak}일 연속 기록</span><span>🎯 목표 달성 ${hit}일</span><span>🧊 냉장고 재료 ${st.fridge.length}개</span></div>
-      </div>`;
+      <div class="pf-top">
+        <button type="button" class="avatar" id="myAvatar" title="눌러서 바꾸기">${prof.avatar}</button>
+        <div class="who">
+          <span class="demo-tag">시연용 데모 사용자</span>
+          <h2 class="pf-name">${esc(name)}<small>${prof.age ? `${prof.age}세` : ""}${prof.sex ? ` · ${esc(prof.sex)}` : ""}</small></h2>
+          <span class="goal-line">${prof.height ? `${prof.height}cm · ${prof.weight}kg${bmi ? ` · BMI ${bmi}` : ""}${prof.targetWeight ? ` → 목표 ${prof.targetWeight}kg` : ""}` : ""}</span>
+        </div>
+      </div>
+      <div class="pf-grid">
+        <div><small>건강 정보</small><div class="pf-chips">${(prof.conditions || []).map(c => `<span class="cond">${/혈압/.test(c) ? "❤️" : /당뇨/.test(c) ? "🩸" : "🩺"} ${esc(c)}</span>`).join("") || "<span>등록 안 함</span>"}</div></div>
+        <div><small>식단 목표</small><div class="pf-chips">${st.goals.map(k => `<span class="goal">${esc(App.goals[k].label)}</span>`).join("")}</div></div>
+      </div>
+      <div class="pf-targets">
+        <div><small>하루 칼로리</small><b>${st.kcalTarget}<em>kcal</em></b></div><div><small>단백질</small><b>${tg.protein}<em>g</em></b></div>
+        <div><small>탄수화물</small><b>${tg.carbs}<em>g 이하</em></b></div><div><small>나트륨</small><b>${tg.sodium.toLocaleString()}<em>mg 이하</em></b></div>
+      </div>
+      <div class="my-badges"><span>🔥 ${streak}일 연속 기록</span><span>🎯 목표 달성 ${hit}일</span><span>🧊 냉장고 재료 ${st.fridge.length}개</span>
+        <button type="button" class="ghost small" id="myBriefing">📋 오늘의 브리핑 다시 보기</button><button type="button" class="ghost small" id="myReset" title="데모 데이터를 처음 상태로">↺ 데모 초기화</button></div>`;
 
     // 오늘의 영양
     const now = { kcal: sum(items, "kcal"), protein: sum(items, "protein"), carbs: sum(items, "carbs"), fat: sum(items, "fat"), sodium: sum(items, "sodium") };
@@ -115,6 +129,23 @@
         <span class="kc">${Math.round(it.kcal)}kcal<small>단백질 ${Math.round(it.protein || 0)}g</small></span>
         <button type="button" class="del" data-del="${i}" aria-label="${esc(it.name)} 기록 삭제">✕</button>
       </li>`).join("") : '<li class="empty-meal">아직 기록이 없어요. 위에서 음식 사진을 올려보세요!</li>';
+  }
+
+  // 웨어러블 건강 요약 (health.js)
+  function renderHealth() {
+    const H = window.JisikHealth, box = $("myHealth");
+    if (!H || !box) return;
+    const ICON = { ok: "✅", warn: "⚠️", bad: "🚨" };
+    const c = H.cur;
+    const val = { glu: `${c.glu}<em>mg/dL</em>`, bp: `${c.sys}/${c.dia}<em>mmHg</em>`, hr: `${c.hr}<em>bpm</em>`, spo2: `${c.spo2}<em>%</em>`,
+      ecg: `<span class="sm">${H.ecg().rhythm}</span>`, temp: `${c.temp}<em>℃</em>`, act: `${c.steps.toLocaleString()}<em>걸음</em>` };
+    const keys = ["glu", "bp", "hr", "spo2", "ecg", "temp", "act"];
+    const warn = keys.filter(k => H.status(k).level !== "ok");
+    box.innerHTML = `
+      <div class="my-card-head"><h2>⌚ 오늘의 건강 (웨어러블)</h2><span class="live-dot">● 실시간</span></div>
+      <p class="sub">${warn.length ? `<b class="t-warn">${warn.map(k => H.METRICS[k].name).join("·")}</b> 확인이 필요해요. 항목을 누르면 시간대별 그래프가 열려요.` : "모든 항목이 개인 기준 범위 안이에요. 항목을 누르면 그래프가 열려요."}</p>
+      <div class="hgrid">${keys.map(k => { const st = H.status(k), m = H.METRICS[k]; return `
+        <button type="button" class="htile lv-${st.level}" data-m="${k}"><span class="hn">${m.icon} ${m.name}</span><b>${val[k]}</b><span class="lv lv-${st.level}">${ICON[st.level]} ${H.LEVEL[st.level]}</span></button>`; }).join("")}</div>`;
   }
 
   function coach(st, now, tg) {
@@ -276,7 +307,16 @@
       const cur = App.getState().profile.avatar || AVATARS[0];
       App.setProfile({ avatar: AVATARS[(AVATARS.indexOf(cur) + 1) % AVATARS.length] });
     });
-    $("myProfile").addEventListener("change", e => { if (e.target.id === "myNick") App.setProfile({ nick: e.target.value.trim() || "지식 사용자" }); });
+    $("myProfile").addEventListener("click", e => {
+      if (e.target.id === "myBriefing") window.JisikBriefing?.show();
+      if (e.target.id === "myReset") { if (e.target.dataset.armed) App.resetDemo(); else { e.target.dataset.armed = "1"; e.target.textContent = "한 번 더 누르면 초기화"; } }
+    });
+    $("myHealth").addEventListener("click", e => {
+      const b = e.target.closest("[data-m]"); if (!b) return;
+      location.hash = "wearable";
+      setTimeout(() => window.JisikWear?.open(b.dataset.m), 150);
+    });
+    window.addEventListener("jisik:health", renderHealth);
     $("myWeek").addEventListener("click", e => {
       if (e.target.id !== "mySampleWeek") return;
       const st = App.getState(), daily = st.daily.slice();
@@ -292,7 +332,7 @@
     });
 
     let raf = 0;
-    window.addEventListener("jisik:change", () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { if (!document.activeElement || document.activeElement.id !== "myNick") render(); }); });
+    window.addEventListener("jisik:change", () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(render); });
     fetch("/api/status").then(r => r.ok ? r.json() : {}).then(f => { features = { ...features, ...f }; mode(); }).catch(mode);
   }
   function mode() {
@@ -302,4 +342,5 @@
 
   bind();
   render();
+  renderHealth();
 })();

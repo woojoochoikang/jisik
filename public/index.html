@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="simcam.css">
   <link rel="stylesheet" href="extras.css">
   <link rel="stylesheet" href="wearable.css">
+  <link rel="stylesheet" href="demo.css">
 </head>
 <body>
   <header class="topbar">
@@ -25,14 +26,13 @@
   </header>
 
   <nav class="app-tabs" role="tablist" aria-label="주요 화면">
-    <button type="button" role="tab" id="mealTab" aria-controls="mealPanel" aria-selected="true" tabindex="0">🍳 오늘의 식단</button>
-    <button type="button" role="tab" id="fridgeTab" aria-controls="fridgePanel" aria-selected="false" tabindex="-1">🧊 내 냉장고를 한눈에</button>
+    <button type="button" role="tab" id="myTab" aria-controls="myPanel" aria-selected="true" tabindex="0"><span class="step">1</span>👤 마이페이지</button>
+    <button type="button" role="tab" id="kitchenTab" aria-controls="fridgePanel mealPanel" aria-selected="false" tabindex="-1"><span class="step">2</span>🧊 냉장고 & 오늘의 식단</button>
+    <button type="button" role="tab" id="wearTab" aria-controls="wearPanel" aria-selected="false" tabindex="-1"><span class="step">3</span>⌚ 웨어러블 건강 데이터</button>
     <button type="button" role="tab" id="simTab" aria-controls="simPanel" aria-selected="false" tabindex="-1">📹 냉장고 카메라 시연</button>
-    <button type="button" role="tab" id="wearTab" aria-controls="wearPanel" aria-selected="false" tabindex="-1">⌚ 웨어러블 연동 시연</button>
-    <button type="button" role="tab" id="myTab" aria-controls="myPanel" aria-selected="false" tabindex="-1">👤 마이페이지</button>
   </nav>
   <main class="layout">
-    <section class="fridge-studio" id="fridgePanel" role="tabpanel" aria-labelledby="fridgeTab" hidden>
+    <section class="fridge-studio" id="fridgePanel" role="tabpanel" aria-labelledby="kitchenTab" hidden>
       <div class="studio-heading"><div><span class="studio-eyebrow">MY LITTLE KITCHEN</span><h1 id="studioTitle">내 냉장고를 한눈에.</h1><p>몇 층에, 어떤 재료가 있는지. 문을 열어 확인해요.</p></div><span class="studio-live">카메라 연동 미리보기</span></div>
       <div class="fridge-expiry-alert" id="fridgeExpiryAlert" aria-live="polite" hidden></div>
       <div class="studio-body">
@@ -55,6 +55,7 @@
           <div class="inspector-top"><span class="studio-eyebrow">FRIDGE INVENTORY</span><span id="fridgeUrgentCount"></span></div>
           <h2>층별 보관 위치</h2><p class="inspector-intro">재료를 누르면 보관 위치와 유통기한을 확인할 수 있어요.</p>
           <div id="fridgeSelected" class="fridge-selected" aria-live="polite"></div>
+          <div id="pickRecipes" class="pick-recipes" aria-live="polite"></div>
           <p class="camera-preview-note">냉장고 카메라가 인식한 재료의 위치를 확인하는 화면입니다. 현재는 시연용 예시 위치를 보여드려요.</p>
           <div class="shelf-list" id="fridgeShelfList"></div>
           <a class="fridge-add-link" href="#fridgeCard">＋ 냉장고에 재료 추가하기</a>
@@ -62,48 +63,14 @@
       </div>
     </section>
     <!-- 발표용: 웨어러블 건강 데이터 연동 시뮬레이션 -->
-    <section class="wear" id="wearPanel" role="tabpanel" aria-labelledby="wearTab" hidden>
-      <div class="sim-head">
-        <div>
-          <span class="sim-eyebrow">PRESENTATION DEMO · WEARABLE HEALTH SYNC</span>
-          <h1>웨어러블 건강 데이터 연동 시뮬레이션</h1>
-          <p>스마트워치와 연속혈당측정기(CGM)의 <b>혈당·혈압·심박·활동량</b>을 실시간으로 받아 지금 몸 상태에 맞는 식단을 추천하는 과정을 재현해요.</p>
-        </div>
-        <div class="sim-head-btns">
-          <button type="button" class="primary" id="wearConnect">🔗 기기 연결하기</button>
-          <button type="button" class="ghost" id="wearAuto" disabled>▶ 자동 시나리오</button>
-        </div>
-      </div>
-
-      <div class="wear-body">
-        <div class="wear-left">
-          <div class="watch" id="wearWatch">
-            <div class="watch-face" id="wearFace"><span class="wf-off">⌚<br>연결 대기 중</span></div>
-          </div>
-          <ul class="devices" id="wearDevices"></ul>
-          <div class="sim-card">
-            <h2>🎬 상황 바꿔보기</h2>
-            <div class="scenarios" id="wearScenarios"></div>
-          </div>
-        </div>
-
-        <div class="wear-main">
-          <div class="metrics" id="wearMetrics"></div>
-          <div class="wear-reco" id="wearReco"></div>
-          <div class="sim-card">
-            <h2>🔔 건강 알림</h2>
-            <ol class="sim-log" id="wearLog"><li class="empty-log">기기를 연결하면 실시간 데이터가 들어와요.</li></ol>
-          </div>
-          <p class="wear-note">※ 발표용 시뮬레이션 데이터예요. 실제 기기와 연결되지 않으며, 의학적 진단·처방을 대신하지 않아요.</p>
-        </div>
-      </div>
-    </section>
+    <section class="wear" id="wearPanel" role="tabpanel" aria-labelledby="wearTab" hidden></section>
 
     <!-- 마이페이지: 프로필 · 오늘 영양 · 음식 사진 기록 · 주간 그래프 -->
     <section class="mypage" id="myPanel" role="tabpanel" aria-labelledby="myTab" hidden>
       <div class="my-grid">
         <div class="my-col">
           <div class="my-card my-profile" id="myProfile"></div>
+          <div class="my-card" id="myHealth"></div>
           <div class="my-card" id="myToday"></div>
           <div class="my-card" id="myWeek"></div>
         </div>
@@ -192,7 +159,7 @@
       </div>
     </section>
 
-    <div class="meal-panel" id="mealPanel" role="tabpanel" aria-labelledby="mealTab">
+    <div class="meal-panel" id="mealPanel" role="tabpanel" aria-labelledby="kitchenTab">
     <!-- 왼쪽: 목표 + 냉장고 -->
     <aside class="side">
       <section class="card" id="goalCard">
@@ -244,6 +211,7 @@
         <div>
           <h1>오늘 만들 수 있는 추천 레시피</h1>
           <p class="sub" id="recSub"></p>
+          <div class="ing-filter" id="ingFilter" hidden></div>
         </div>
         <div class="filters">
           <select id="mealFilter" aria-label="식사 시간">
@@ -377,14 +345,19 @@
     </form>
   </aside>
 
+  <!-- 첫 화면 '오늘의 브리핑' -->
+  <div class="briefing" id="briefing" role="dialog" aria-modal="true" aria-labelledby="brTitle" hidden></div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="recipes.js"></script>
   <script src="fridge3d.js"></script>
   <script src="app.js"></script>
+  <script src="health.js"></script>
   <script src="simcam.js"></script>
   <script src="mypage.js"></script>
   <script src="chat.js"></script>
   <script src="wearable.js"></script>
+  <script src="briefing.js"></script>
 </body>
 </html>

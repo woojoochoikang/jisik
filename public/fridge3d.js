@@ -26,7 +26,7 @@
     }
     return best;
   }
-  function select(id) { selected = id; render(items); }
+  function select(id) { selected = id; render(items); window.dispatchEvent(new CustomEvent('jisik:pick-food', { detail: id })); }
   function render(fridge) {
     items = fridge;
     if (!items.some(f => f.id === selected)) selected = items[0]?.id || null;
@@ -67,19 +67,21 @@
     const food = e.target.closest('[data-food]');
     if (food) { select(food.dataset.food); return; }
   });
-  // 탭: [탭 버튼 id, 패널 id, 주소 해시] — 탭을 추가하려면 여기에 한 줄만 추가
-  const TABS = [['mealTab', 'mealPanel', 'meals'], ['fridgeTab', 'fridgePanel', 'fridge'], ['simTab', 'simPanel', 'camera'], ['wearTab', 'wearPanel', 'wearable'], ['myTab', 'myPanel', 'my']]
-    .filter(([t, p]) => $(t) && $(p));
+  // 탭: [탭 버튼 id, [패널 id들], 주소 해시] — 한 탭에 여러 패널을 함께 보여줄 수 있음
+  // 시연 흐름 순서: 마이페이지 → 냉장고 & 오늘의 식단 → 웨어러블 → (추가) 카메라 시연
+  const TABS = [['myTab', ['myPanel'], 'my'], ['kitchenTab', ['fridgePanel', 'mealPanel'], 'kitchen'], ['wearTab', ['wearPanel'], 'wearable'], ['simTab', ['simPanel'], 'camera']]
+    .filter(([t, ps]) => $(t) && ps.every(p => $(p)));
+  const ALIAS = { meals: 'kitchen', fridge: 'kitchen' }; // 예전 주소도 지원
   function showTab(index, focus = false) {
-    TABS.forEach(([t, p], i) => {
+    TABS.forEach(([t, ps], i) => {
       const active = i === index, tab = $(t);
       tab.setAttribute('aria-selected', String(active)); tab.tabIndex = active ? 0 : -1;
       if (active && focus) tab.focus();
-      $(p).hidden = !active;
+      ps.forEach(p => { $(p).hidden = !active; });
     });
     window.dispatchEvent(new CustomEvent('jisik:tab', { detail: TABS[index][2] }));
   }
-  const go = (i, focus) => { location.hash = TABS[i][2]; showTab(i, focus); };
+  const go = (i, focus) => { location.hash = TABS[i][2]; showTab(i, focus); window.scrollTo({ top: 0 }); };
   TABS.forEach(([t], i) => {
     $(t).addEventListener('click', () => go(i));
     $(t).addEventListener('keydown', e => {
@@ -90,9 +92,13 @@
       go(next, true);
     });
   });
-  function syncTab() { const i = TABS.findIndex(([, , h]) => '#' + h === location.hash); showTab(i < 0 ? 0 : i); }
+  function syncTab() {
+    const h = location.hash.slice(1), want = ALIAS[h] || h;
+    const i = TABS.findIndex(([, , hh]) => hh === want);
+    showTab(i < 0 ? 0 : i);
+  }
   window.addEventListener('hashchange', syncTab); syncTab();
-  document.querySelector('.fridge-add-link').addEventListener('click', () => showTab(0));
+  document.querySelector('.fridge-add-link').addEventListener('click', e => { e.preventDefault(); document.getElementById('fridgeCard')?.scrollIntoView({ behavior: 'smooth' }); });
   $('fridgeDoorToggle').addEventListener('click', () => {
     open = !open; $('fridgeDoor').classList.toggle('closed', !open);
     $('fridgeDoorToggle').textContent = open ? '문 닫기' : '문 열기'; $('fridgeDoorToggle').setAttribute('aria-expanded', String(open));
@@ -107,5 +113,5 @@
   });
   $('fridgeViewport').addEventListener('pointermove', e => { if (drag) setAngle(drag.angle + (e.clientX - drag.x) * .2); });
   for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) $('fridgeViewport').addEventListener(name, () => { drag = null; });
-  window.Fridge3D = { render, validLocation: valid, nextLocation };
+  window.Fridge3D = { render, validLocation: valid, nextLocation, selected: () => selected };
 })();

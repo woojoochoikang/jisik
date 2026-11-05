@@ -59,10 +59,27 @@
   }
   const uid = () => Math.random().toString(36).slice(2, 9);
 
-  let state = load() || {
-    goal: "diet", kcalTarget: GOALS.diet.kcal, proteinTarget: GOALS.diet.protein,
-    fridge: [], log: { date: todayStr(), items: [] }, history: [], firstVisit: true
-  };
+  // ---------- 발표용 데모 사용자: 황성욱 (25세, 고혈압·당뇨, 다이어트 목표) ----------
+  const DEMO_VERSION = "hsw-v1";
+  function demoState() {
+    const at = (h, m) => { const d = new Date(); d.setHours(h, m, 0, 0); return d.getTime(); };
+    const fridge = [["시금치", 1], ["두부", 2], ["닭가슴살", 2], ["연어", 2], ["현미밥", 1], ["버섯", 3], ["브로콜리", 3],
+      ["방울토마토", 4], ["토마토", 5], ["우유", 5], ["그릭요거트", 6], ["대파", 6], ["바나나", 3], ["달걀", 12], ["양파", 20], ["김치", 40], ["귀리", 100]]
+      .map(([name, d]) => ({ id: uid(), name, exp: addDays(d) }));
+    const past = [1580, 1720, 1490, 1650, 1830, 1540];
+    const daily = past.map((kcal, i) => ({ date: addDays(i - 6), kcal, protein: [82, 74, 91, 86, 70, 88][i], carbs: Math.round(kcal * 0.45 / 4), fat: Math.round(kcal * 0.27 / 9), sodium: [1620, 1980, 1450, 1580, 2310, 1490][i], count: 3 }));
+    return {
+      demo: DEMO_VERSION, goal: "diet", goals: ["diet", "diabetes", "hypertension"], kcalTarget: 1600, proteinTarget: 90,
+      profile: { name: "황성욱", nick: "황성욱", age: 25, sex: "남성", height: 176, weight: 84, targetWeight: 78, avatar: "🧑", conditions: ["고혈압", "당뇨(2형)"] },
+      fridge, history: [], daily, firstVisit: false,
+      log: { date: todayStr(), items: [
+        { id: "meal-demo1", name: "그릭요거트 볼", emoji: "🫐", kcal: 280, protein: 20, carbs: 30, fat: 9, sodium: 70, meal: "아침", time: at(8, 10), source: "photo" },
+        { id: "meal-demo2", name: "비빔밥 (밥 반 공기)", emoji: "🍲", kcal: 480, protein: 19, carbs: 62, fat: 14, sodium: 880, meal: "점심", time: at(12, 35), source: "photo" }
+      ] }
+    };
+  }
+  let state = load();
+  if (!state || state.demo !== DEMO_VERSION) state = demoState();
   state.daily = state.daily || [];
   // 여러 목표 동시 선택 (예: 당뇨 + 다이어트). state.goal은 첫 번째 목표(이전 버전 호환)
   if (!Array.isArray(state.goals) || !state.goals.length) state.goals = [state.goal || "balance"];
@@ -208,11 +225,13 @@
       });
       if (changed) save();
       window.Fridge3D.render(state.fridge);
+      const sel = state.fridge.find(f => f.id === window.Fridge3D.selected());
+      renderPick(sel?.name);
     }
     const list = [...state.fridge].sort((a, b) => a.exp.localeCompare(b.exp));
     $("#fridgeList").innerHTML = list.map(f => {
       const d = dday(f.exp);
-      return `<li><span class="em">${emojiOf(f.name)}</span>
+      return `<li class="${ingFilter && sameIng(f.name, ingFilter) ? "picked" : ""}" data-pick="${esc(f.name)}" title="${esc(f.name)} 활용 메뉴 보기"><span class="em">${emojiOf(f.name)}</span>
         <span class="nm">${esc(f.name)}<br><span class="dt">~ ${f.exp.slice(5).replace("-", "/")}</span></span>
         ${ddayBadge(d)}<button class="del" data-del="${f.id}" aria-label="${esc(f.name)} 삭제">✕</button></li>`;
     }).join("");
@@ -242,9 +261,28 @@
   const ddayText = d => d < 0 ? `${-d}일 지남` : d === 0 ? "오늘까지" : d <= 10 ? `D-${d}` : "기한 여유";
 
   // ---------- 렌더링: 추천 ----------
+  let ingFilter = null; // 냉장고에서 고른 재료로 추천 좁히기
+  const usesIng = (r, name) => r.ingredients.some(i => !isPantry(i.n) && sameIng(i.n, name));
+  function setIngFilter(name, scroll) {
+    ingFilter = name; renderRecs();
+    if (scroll) document.querySelector(".rec-head")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  function renderPick(name) {
+    const box = $("#pickRecipes"); if (!box) return;
+    if (!name) { box.innerHTML = ""; return; }
+    const list = RECIPES.map(analyze).filter(x => usesIng(x.r, name)).sort((a, b) => b.score - a.score).slice(0, 3);
+    box.innerHTML = `<h3>🍳 ${emojiOf(name)} ${esc(name)} 활용 메뉴</h3>` + (list.length
+      ? list.map(x => `<button type="button" class="pick-item ${x.urgent.length ? "hot" : ""}" data-open="${x.r.id}"><span>${x.r.emoji}</span><b>${esc(x.r.name)}</b><small>${x.r.kcal}kcal${x.urgent.length ? " · ⏰ 임박 재료" : ""}${x.missing.length ? ` · 🛒${x.missing.length}` : " · 바로 가능"}</small></button>`).join("")
+        + `<button type="button" class="ghost small pick-all" data-filter="${esc(name)}">추천 목록에서 모두 보기 ↓</button>`
+      : '<p class="pick-none">이 재료가 들어가는 레시피가 아직 없어요.</p>');
+  }
+
   function renderRecs() {
     const meal = $("#mealFilter").value, ready = $("#readyOnly").checked;
     let list = RECIPES.map(analyze);
+    if (ingFilter) list = list.filter(x => usesIng(x.r, ingFilter));
+    const chip = $("#ingFilter");
+    if (chip) { chip.hidden = !ingFilter; chip.innerHTML = ingFilter ? `🔎 <b>${emojiOf(ingFilter)} ${esc(ingFilter)}</b> 활용 메뉴만 보는 중 <button type="button" class="ghost small" data-clear>전체 보기 ✕</button>` : ""; }
     if (meal) list = list.filter(x => x.r.meal.includes(meal));
     if (ready) list = list.filter(x => x.missing.length === 0);
     list.sort((a, b) => b.score - a.score);
@@ -281,9 +319,10 @@
     if (x.overKcal) reason += `<br>⚠️ 오늘 남은 칼로리보다 많아요`;
 
     const pct = x.req.length ? Math.round(x.have.length / x.req.length * 100) : 100;
-    return `<button class="rcard" data-open="${r.id}">
+    const hot = x.urgent.some(u => u.d <= 1); // 내일까지인 재료를 쓰는 메뉴는 강하게 강조
+    return `<button class="rcard ${hot ? "urgent-card" : ""}" data-open="${r.id}">
       <div class="thumb" style="background:linear-gradient(135deg,hsl(${h} 80% 88%),hsl(${(h + 40) % 360} 85% 94%))">
-        <span class="rank">${i + 1}위</span><span class="score">매칭 ${pct}%</span>${r.emoji}</div>
+        <span class="rank">${i + 1}위</span>${hot ? `<span class="ribbon">⏰ ${esc(x.urgent.filter(u => u.d <= 1).map(u => u.n).join("·"))} 오늘·내일까지!</span>` : ""}<span class="score">매칭 ${pct}%</span>${r.emoji}</div>
       <div class="rbody">
         <div class="rname">${esc(r.name)}</div>
         <div class="rmeta"><span>⏱ ${r.time}분</span><span>🔥 ${r.kcal}kcal</span><span>💪 ${r.protein}g</span><span>🧂 ${r.sodium}mg</span></div>
@@ -731,8 +770,16 @@
       $("#ingName").value = ""; $("#ingDate").value = addDays(7); $("#ingName").focus();
     });
     $("#quickAdd").addEventListener("click", e => { const b = e.target.closest("[data-quick]"); if (b) addItem(b.dataset.quick); });
+    // 3D 냉장고에서 재료를 고르면 그 재료로 만들 수 있는 메뉴를 바로 보여줌
+    window.addEventListener("jisik:pick-food", e => { const f = state.fridge.find(x => x.id === e.detail); renderPick(f?.name); });
+    $("#pickRecipes")?.addEventListener("click", e => {
+      const o = e.target.closest("[data-open]"); if (o) { openRecipe(o.dataset.open); return; }
+      const f = e.target.closest("[data-filter]"); if (f) { setIngFilter(f.dataset.filter, true); renderFridge(); }
+    });
+    $("#ingFilter")?.addEventListener("click", e => { if (e.target.closest("[data-clear]")) { ingFilter = null; renderRecs(); renderFridge(); } });
     $("#fridgeList").addEventListener("click", e => {
-      const b = e.target.closest("[data-del]"); if (!b) return;
+      const b = e.target.closest("[data-del]");
+      if (!b) { const li = e.target.closest("[data-pick]"); if (li) { setIngFilter(li.dataset.pick, true); renderFridge(); } return; }
       state.fridge = state.fridge.filter(f => f.id !== b.dataset.del);
       save(); renderFridge(); renderRecs();
     });
@@ -793,6 +840,7 @@
       .map(x => ({ id: x.r.id, name: x.r.name, emoji: x.r.emoji, kcal: x.r.kcal, protein: x.r.protein, carbs: x.r.carbs, fat: x.r.fat, sugar: x.r.sugar, sodium: x.r.sodium,
         tags: x.r.tags, time: x.r.time, score: x.score, missing: x.missing.map(m => m.n), urgent: x.urgent.map(u => u.n), good: x.fit.good, bad: x.fit.bad })),
     recipes: () => RECIPES,
+    resetDemo: () => { try { localStorage.removeItem(KEY); localStorage.removeItem("jisik.health.v1"); } catch { /* 무시 */ } location.hash = "my"; location.reload(); },
     openRecipe: id => openRecipe(id)
   };
 })();

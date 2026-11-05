@@ -57,7 +57,7 @@
   function greeting() {
     const c = ctx();
     return {
-      text: `안녕하세요! 지식 AI 상담사예요 🥗\n지금 **${c.goal.label}** 목표로, 오늘 ${c.eaten}kcal 드셨고 **${Math.max(0, c.remain)}kcal** 남았어요.` +
+      text: `안녕하세요${c.st.profile.name ? `, ${c.st.profile.name}님` : ""}! 지식 AI 상담사예요 🥗\n지금 **${c.goal.label}** 목표로, 오늘 ${c.eaten}kcal 드셨고 **${Math.max(0, c.remain)}kcal** 남았어요.` +
         (c.urgent.length ? `\n냉장고에 곧 기한이 끝나는 재료가 ${c.urgent.length}개 있어요: ${c.urgent.slice(0, 4).map(f => `${f.name}(${dtext(f.d)})`).join(", ")}` : "") +
         "\n무엇이든 물어보세요!"
     };
@@ -85,10 +85,11 @@
       return { text: `**${ing}**로 만들 수 있는 요리예요:\n` + list.map((r, i) => `${i + 1}. ${r.emoji} ${r.name} · ${r.kcal}kcal — ${why(r)}`).join("\n"), actions: list.map(openAct) };
     }
 
-    if (/(혈당|혈압|심박|건강|웨어러블|워치|컨디션|몸상태)/.test(s)) {
-      const h = window.JisikHealth?.summary?.();
-      if (!h) return { text: "웨어러블 기기가 아직 연결되지 않았어요. '⌚ 웨어러블 연동 시연'에서 기기를 연결하면 혈당·혈압에 맞춰 추천해 드려요.", actions: [{ label: "⌚ 웨어러블 연결하러 가기", type: "tab", hash: "wearable" }] };
-      return { text: `⌚ 지금 측정값: 혈당 ${h.혈당}, 혈압 ${h.혈압}, 심박 ${h.심박}\n${h.상태}\n${h.조언}\n\n지금 몸 상태에 맞는 추천:\n` + h.추천.map((r, i) => `${i + 1}. ${r.emoji} ${r.name} — ${r.why.join(", ")}`).join("\n"), actions: h.추천.slice(0, 2).map(openAct) };
+    if (/(혈당|혈압|심박|건강|웨어러블|워치|컨디션|몸상태|산소|체온|심전도|활동)/.test(s)) {
+      const h = window.JisikHealth?.summary?.(), rc = window.JisikWear?.reco?.();
+      if (!h || !rc) return { text: "웨어러블 데이터를 아직 불러오지 못했어요.", actions: [{ label: "⌚ 웨어러블 화면 열기", type: "tab", hash: "wearable" }] };
+      return { text: `⌚ 지금 측정값\n` + Object.entries(h).map(([k, v]) => `- ${k}: ${v}`).join("\n") + `\n\n${rc.head}\n${rc.tip}\n\n지금 몸 상태에 맞는 추천:\n` + rc.top.map((r, i) => `${i + 1}. ${r.emoji} ${r.name} — ${r.why.join(", ")}`).join("\n"),
+        actions: [...rc.top.slice(0, 2).map(openAct), { label: "⌚ 웨어러블 그래프 보기", type: "tab", hash: "wearable" }] };
     }
 
     if (/(유통|임박|기한|상하|버려|오래된)/.test(s)) {
