@@ -1,0 +1,6 @@
+{
+  "naverClientId": "여기에_네이버_Client_ID",
+  "naverClientSecret": "여기에_네이버_Client_Secret",
+  "anthropicApiKey": "",
+  "anthropicModel": "claude-haiku-4-5"
+}

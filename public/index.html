@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>지식 — 지루하지 않은 식단</title>
+  <meta name="description" content="냉장고 재료와 식단 목표로 오늘 만들 수 있는 맞춤 레시피를 추천해요.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥗</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">지식</span>
+      <span class="tagline">지루하지 않은 식단</span>
+    </div>
+    <div class="today" id="todayLabel"></div>
+  </header>
+
+  <main class="layout">
+    <!-- 왼쪽: 목표 + 냉장고 -->
+    <aside class="side">
+      <section class="card" id="goalCard">
+        <h2>🎯 나의 식단 목표</h2>
+        <div class="goal-chips" id="goalChips" role="radiogroup" aria-label="식단 목표"></div>
+        <p class="goal-desc" id="goalDesc"></p>
+
+        <div class="targets">
+          <label>하루 칼로리 목표
+            <span class="input-unit"><input type="number" id="kcalTarget" min="800" max="5000" step="50"> kcal</span>
+          </label>
+          <label>하루 단백질 목표
+            <span class="input-unit"><input type="number" id="proteinTarget" min="20" max="300" step="5"> g</span>
+          </label>
+        </div>
+
+        <div class="intake">
+          <div class="intake-row"><span>오늘 섭취 칼로리</span><b id="kcalText"></b></div>
+          <div class="bar"><div class="bar-fill" id="kcalBar"></div></div>
+          <div class="intake-row"><span>오늘 섭취 단백질</span><b id="proteinText"></b></div>
+          <div class="bar protein"><div class="bar-fill" id="proteinBar"></div></div>
+          <ul class="eaten" id="eatenList"></ul>
+        </div>
+      </section>
+
+      <section class="card" id="fridgeCard">
+        <div class="card-head">
+          <h2>🧊 내 냉장고</h2>
+          <div class="head-btns">
+            <button class="primary small" id="scanOpen" title="영수증이나 포장 라벨을 찍어서 자동 추가">📷 사진으로 추가</button>
+            <button class="ghost small" id="sampleBtn" title="예시 재료로 채우기">예시 채우기</button>
+          </div>
+        </div>
+        <form class="add-form" id="addForm" autocomplete="off">
+          <input list="ingredientList" id="ingName" placeholder="재료 이름 (예: 두부)" required>
+          <datalist id="ingredientList"></datalist>
+          <input type="date" id="ingDate" required aria-label="유통기한">
+          <button type="submit" class="primary">추가</button>
+        </form>
+        <div class="quick" id="quickAdd" aria-label="빠른 추가"></div>
+        <ul class="fridge" id="fridgeList"></ul>
+        <p class="empty" id="fridgeEmpty">냉장고가 비어 있어요. 재료를 추가하거나 <b>예시 채우기</b>를 눌러보세요.</p>
+      </section>
+    </aside>
+
+    <!-- 오른쪽: 추천 -->
+    <section class="main">
+      <div class="rec-head">
+        <div>
+          <h1>오늘 만들 수 있는 추천 레시피</h1>
+          <p class="sub" id="recSub"></p>
+        </div>
+        <div class="filters">
+          <select id="mealFilter" aria-label="식사 시간">
+            <option value="">모든 끼니</option>
+            <option>아침</option><option>점심</option><option>저녁</option><option>간식</option>
+          </select>
+          <label class="toggle"><input type="checkbox" id="readyOnly"> 지금 바로 가능한 것만</label>
+          <button class="ghost" id="shuffleBtn" title="비슷한 점수끼리 순서를 섞어요">🔀 다른 메뉴</button>
+        </div>
+      </div>
+
+      <div class="urgent" id="urgentBanner" hidden></div>
+      <div class="grid" id="recGrid"></div>
+      <p class="empty big" id="recEmpty" hidden>조건에 맞는 레시피가 없어요. 필터를 풀거나 재료를 더 추가해보세요.</p>
+    </section>
+  </main>
+
+  <!-- 레시피 상세 -->
+  <dialog id="recipeModal" aria-labelledby="mTitle">
+    <div class="modal">
+      <button class="close" id="closeModal" aria-label="닫기">✕</button>
+      <div class="m-hero">
+        <div class="m-emoji" id="mEmoji"></div>
+        <div>
+          <h2 id="mTitle"></h2>
+          <div class="m-meta" id="mMeta"></div>
+          <div class="m-badges" id="mBadges"></div>
+        </div>
+      </div>
+
+      <div class="m-body">
+        <div class="m-col">
+          <h3>필요한 재료</h3>
+          <ul class="ing-list" id="mIngredients"></ul>
+          <div class="shop" id="mShop"></div>
+        </div>
+
+        <div class="m-col">
+          <div class="player-head">
+            <h3>조리 순서</h3>
+            <div class="view-switch" role="tablist">
+              <button class="seg active" data-view="player" role="tab">▶ 단계별 보기</button>
+              <button class="seg" data-view="list" role="tab">☰ 전체 목록</button>
+            </div>
+          </div>
+
+          <div class="player" id="player">
+            <div class="progress" id="stepProgress"></div>
+            <div class="stage" id="stage"></div>
+            <div class="controls">
+              <button class="ghost" id="prevStep" aria-label="이전 단계">◀ 이전</button>
+              <button class="primary" id="playBtn">▶ 자동 재생</button>
+              <button class="ghost" id="nextStep" aria-label="다음 단계">다음 ▶</button>
+            </div>
+            <div class="timer-row">
+              <button class="ghost small" id="timerBtn">⏱ 실제 조리 타이머 시작</button>
+              <span class="timer" id="timerText"></span>
+            </div>
+          </div>
+          <ol class="step-list" id="stepList" hidden></ol>
+
+          <a class="video-link" id="videoLink" target="_blank" rel="noopener">🎬 유튜브에서 조리 영상 찾아보기</a>
+        </div>
+      </div>
+
+      <div class="m-foot">
+        <label class="toggle"><input type="checkbox" id="useUp" checked> 사용한 재료를 냉장고에서 빼기</label>
+        <button class="primary big" id="doneBtn">🍽️ 다 만들었어요! 오늘 식단에 기록</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 영수증·라벨 인식 -->
+  <dialog id="scanModal" aria-labelledby="scanTitle">
+    <div class="modal scan">
+      <button class="close" data-close-scan aria-label="닫기">✕</button>
+      <h2 id="scanTitle">📷 영수증·라벨로 재료 추가</h2>
+      <p class="sub">영수증을 찍으면 <b>산 재료</b>를, 포장 라벨을 찍으면 <b>재료와 소비기한</b>을 찾아서 냉장고에 넣어드려요.</p>
+
+      <div id="scanPick">
+        <div class="pick-btns">
+          <label class="pick primary-pick"><input type="file" accept="image/*" capture="environment" id="scanCamera" hidden>📸 카메라로 찍기</label>
+          <label class="pick"><input type="file" accept="image/*" id="scanFile" hidden>🖼️ 사진·파일 선택</label>
+        </div>
+        <div class="drop" id="scanDrop">또는 이미지를 여기로 끌어다 놓으세요</div>
+        <details class="paste">
+          <summary>사진 대신 글자로 붙여넣기 (온라인 장보기 주문 내역 등)</summary>
+          <textarea id="scanText" rows="5" placeholder="예) 풀무원 국산콩 두부 300g  2,980&#10;서울우유 1L  2,850&#10;소비기한 2026.11.20 까지"></textarea>
+          <button class="ghost small" id="scanTextBtn">글자에서 재료 찾기</button>
+        </details>
+        <p class="engine" id="scanEngine"></p>
+        <ul class="tips">
+          <li>밝은 곳에서 영수증을 평평하게 펴고, 글자가 화면을 가득 채우게 찍어주세요.</li>
+          <li>라벨은 <b>제품명</b>과 <b>소비기한(유통기한)</b>이 함께 보이게 찍으면 날짜까지 자동으로 들어가요.</li>
+        </ul>
+      </div>
+
+      <div id="scanWork" hidden>
+        <img id="scanPreview" alt="선택한 사진 미리보기">
+        <div class="bar"><div class="bar-fill" id="scanBar"></div></div>
+        <p class="scan-msg" id="scanMsg">사진을 읽는 중…</p>
+      </div>
+
+      <div id="scanResult" hidden>
+        <p class="scan-summary" id="scanSummary"></p>
+        <ul class="scan-list" id="scanList"></ul>
+        <button class="ghost small" id="scanAddRow">+ 직접 한 줄 추가</button>
+        <details class="raw"><summary>인식된 글자 보기</summary><pre id="scanRaw"></pre></details>
+        <div class="m-foot">
+          <button class="ghost" id="scanRetry">↺ 다시 찍기</button>
+          <button class="primary big" id="scanConfirm">선택한 재료 냉장고에 넣기</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="recipes.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
