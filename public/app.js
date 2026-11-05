@@ -232,12 +232,12 @@
     const list = [...state.fridge].sort((a, b) => a.exp.localeCompare(b.exp));
     $("#fridgeList").innerHTML = list.map(f => {
       const d = dday(f.exp);
-      return `<li class="${ingFilter && sameIng(f.name, ingFilter) ? "picked" : ""}" data-pick="${esc(f.name)}" title="${esc(f.name)} 활용 메뉴 보기"><span class="em">${emojiOf(f.name)}</span>
+      return `<li class="${ingFilter && sameIng(f.name, ingFilter) ? "picked" : ""}" data-pick="${esc(f.name)}" title="${esc(f.name)} 활용 메뉴 보기"><span class="em">${FoodPhotos.ingredient(f.name)}</span>
         <span class="nm">${esc(f.name)}<br><span class="dt">~ ${f.exp.slice(5).replace("-", "/")}</span></span>
         ${ddayBadge(d)}<button class="del" data-del="${f.id}" aria-label="${esc(f.name)} 삭제">✕</button></li>`;
     }).join("");
     $("#fridgeEmpty").hidden = list.length > 0;
-    $("#quickAdd").innerHTML = QUICK.map(n => `<button data-quick="${n}">${EMOJI[n] || ""} ${n}</button>`).join("");
+    $("#quickAdd").innerHTML = QUICK.map(n => `<button data-quick="${n}">${FoodPhotos.ingredient(n)} ${n}</button>`).join("");
   }
   function addItem(name, exp, opts = {}) {
     name = name.trim(); if (!name) return null;
@@ -292,7 +292,7 @@
     if (!name) { box.innerHTML = ""; return; }
     const list = RECIPES.map(analyze).filter(x => usesIng(x.r, name)).sort((a, b) => b.score - a.score).slice(0, 3);
     box.innerHTML = `<h3>🍳 ${emojiOf(name)} ${esc(name)} 활용 메뉴</h3>` + (list.length
-      ? list.map(x => `<button type="button" class="pick-item ${x.urgent.length ? "hot" : ""}" data-open="${x.r.id}"><span>${x.r.emoji}</span><b>${esc(x.r.name)}</b><small>${x.r.kcal}kcal${x.urgent.length ? " · ⏰ 임박 재료" : ""}${x.missing.length ? ` · 🛒${x.missing.length}` : " · 바로 가능"}</small></button>`).join("")
+      ? list.map(x => `<button type="button" class="pick-item ${x.urgent.length ? "hot" : ""}" data-open="${x.r.id}"><span>${FoodPhotos.recipe(x.r.id)}</span><b>${esc(x.r.name)}</b><small>${x.r.kcal}kcal${x.urgent.length ? " · ⏰ 임박 재료" : ""}${x.missing.length ? ` · 🛒${x.missing.length}` : " · 바로 가능"}</small></button>`).join("")
         + `<button type="button" class="ghost small pick-all" data-filter="${esc(name)}">추천 목록에서 모두 보기 ↓</button>`
       : '<p class="pick-none">이 재료가 들어가는 레시피가 아직 없어요.</p>');
   }
@@ -313,7 +313,7 @@
     const ub = $("#urgentBanner");
     if (urgentItems.length || expired.length) {
       ub.hidden = false;
-      ub.innerHTML = (urgentItems.length ? `<strong class="urgent-title">⏰ ${urgentItems.length}개 재료, 3일 안에 먼저 드세요!</strong>${urgentItems.map(f => `<span class="urgent-ingredient">${emojiOf(f.name)} ${esc(f.name)} <b>${ddayText(dday(f.exp))}</b></span>`).join(" ")}` : "")
+      ub.innerHTML = (urgentItems.length ? `<strong class="urgent-title">⏰ ${urgentItems.length}개 재료, 3일 안에 먼저 드세요!</strong>${urgentItems.map(f => `<span class="urgent-ingredient">${FoodPhotos.ingredient(f.name)} ${esc(f.name)} <b>${ddayText(dday(f.exp))}</b></span>`).join(" ")}` : "")
         + (expired.length ? `<br>🗑️ 유통기한 지난 재료: ${expired.map(f => esc(f.name)).join(", ")} (추천에서 제외)` : "");
     } else ub.hidden = true;
 
@@ -342,7 +342,7 @@
     const hot = x.urgent.some(u => u.d <= 1); // 내일까지인 재료를 쓰는 메뉴는 강하게 강조
     return `<button class="rcard ${hot ? "urgent-card" : ""}" data-open="${r.id}">
       <div class="thumb" style="background:linear-gradient(135deg,hsl(${h} 80% 88%),hsl(${(h + 40) % 360} 85% 94%))">
-        <span class="rank">${i + 1}위</span>${hot ? `<span class="ribbon">⏰ ${esc(x.urgent.filter(u => u.d <= 1).map(u => u.n).join("·"))} 오늘·내일까지!</span>` : ""}<span class="score">매칭 ${pct}%</span>${r.emoji}</div>
+        <span class="rank">${i + 1}위</span>${hot ? `<span class="ribbon">⏰ ${esc(x.urgent.filter(u => u.d <= 1).map(u => u.n).join("·"))} 오늘·내일까지!</span>` : ""}<span class="score">매칭 ${pct}%</span>${FoodPhotos.recipe(r.id)}</div>
       <div class="rbody">
         <div class="rname">${esc(r.name)}</div>
         <div class="rmeta"><span>⏱ ${r.time}분</span><span>🔥 ${r.kcal}kcal</span><span>💪 ${r.protein}g</span><span>🧂 ${r.sodium}mg</span></div>
@@ -360,7 +360,7 @@
     const r = RECIPES.find(x => x.id === id); if (!r) return;
     cur = analyze(r); stepIdx = 0; stopPlay(); stopCook();
     const h = hue(r.id);
-    $("#mEmoji").textContent = r.emoji;
+    $("#mEmoji").innerHTML = FoodPhotos.recipe(r.id);
     $("#mEmoji").style.background = `linear-gradient(135deg,hsl(${h} 80% 88%),hsl(${(h + 40) % 360} 85% 94%))`;
     $("#mTitle").textContent = r.name;
     $("#mMeta").innerHTML = [`⏱ ${r.time}분`, `🔥 ${r.kcal}kcal`, `💪 단백질 ${r.protein}g`, `🍚 탄수 ${r.carbs}g`, `🥑 지방 ${r.fat}g`, `🍬 당류 ${r.sugar}g`, `🧂 나트륨 ${r.sodium}mg`]
@@ -374,7 +374,7 @@
     $("#mIngredients").innerHTML = cur.rows.map(x => {
       const cls = x.status === "have" ? "have" : x.status === "pantry" ? "pantry" : x.opt ? "miss opt" : "miss";
       const st = x.status === "have" ? `보유 ${ddayText(x.d)}` : x.status === "pantry" ? "기본 양념" : x.opt ? "선택" : "부족";
-      return `<li class="${cls}"><span>${emojiOf(x.n)}</span><span>${esc(x.n)}${x.opt ? " <small>(선택)</small>" : ""} <span class="amt">${esc(x.a)}</span></span><span class="st">${st}</span></li>`;
+      return `<li class="${cls}"><span>${FoodPhotos.ingredient(x.n)}</span><span>${esc(x.n)}${x.opt ? " <small>(선택)</small>" : ""} <span class="amt">${esc(x.a)}</span></span><span class="st">${st}</span></li>`;
     }).join("");
     const need = cur.rows.filter(x => x.status === "miss" || x.status === "optmiss");
     renderShop(need);
@@ -392,7 +392,7 @@
 
   function renderStep() {
     const r = cur.r, s = r.steps[stepIdx], a = ACTS[s.act];
-    const items = s.items.map(n => `<span>${emojiOf(n)}</span>`).join("");
+    const items = s.items.map(n => `<span>${FoodPhotos.ingredient(n)}</span>`).join("");
     const stage = $("#stage");
     stage.className = `stage act-${s.act}`;
     stage.style.background = a.bg;
@@ -511,7 +511,7 @@
       <div class="price-wrap">
         <div class="price-head"><h4>💸 최저가로 사기</h4><span class="total" id="shopTotal"></span></div>
         ${need.map((x, i) => `<details class="pitem" data-q="${esc(term(x.n))}" ${i === 0 ? "open" : ""}>
-          <summary>${emojiOf(x.n)} ${esc(x.n)}${x.opt ? " <small>(선택)</small>" : ""}<span class="low" data-low></span></summary>
+          <summary>${FoodPhotos.ingredient(x.n)} ${esc(x.n)}${x.opt ? " <small>(선택)</small>" : ""}<span class="low" data-low></span></summary>
           <div data-body>${features.shop ? '<div class="ploading">최저가 찾는 중…</div>' : ""}</div>
           <div class="mall-links">${MALLS.map(([label, f]) => `<a href="${f(term(x.n))}" target="_blank" rel="noopener">${label} ↗</a>`).join("")}</div>
           ${features.shop ? "" : '<p class="pnote">버튼을 누르면 쇼핑몰에서 가격 낮은 순으로 바로 보여줘요. 서버에 네이버 쇼핑 API 키를 넣으면 실시간 최저가 순위가 여기에 표시돼요.</p>'}
@@ -696,7 +696,7 @@
   function renderScanRows() {
     $("#scanList").innerHTML = scanRows.map((r, i) => `<li class="${r.on ? "" : "off"}">
       <input type="checkbox" data-i="${i}" data-f="on" ${r.on ? "checked" : ""} aria-label="추가 여부">
-      <span class="em">${r.name ? emojiOf(r.name) : "❔"}</span>
+      <span class="em">${r.name ? FoodPhotos.ingredient(r.name) : "❔"}</span>
       <span class="nmcol"><input data-i="${i}" data-f="name" value="${esc(r.name)}" placeholder="재료 이름" list="ingredientList">${r.product ? `<small title="${esc(r.product)}">${esc(r.product)}</small>` : ""}</span>
       <span class="dcol"><input type="date" data-i="${i}" data-f="exp" value="${r.exp}" aria-label="유통기한"><small class="${r.got ? "got" : ""}">${r.got ? "라벨에서 읽은 날짜" : "보관 기간 기본값"}</small></span>
     </li>`).join("");
@@ -729,7 +729,7 @@
       if (f === "on") { scanRows[i].on = e.target.checked; e.target.closest("li").classList.toggle("off", !e.target.checked); }
       if (f === "name") {
         scanRows[i].name = e.target.value;
-        e.target.closest("li").querySelector(".em").textContent = e.target.value ? emojiOf(e.target.value) : "❔";
+        e.target.closest("li").querySelector(".em").innerHTML = e.target.value ? FoodPhotos.ingredient(e.target.value) : "❔";
       }
       if (f === "exp") { scanRows[i].exp = e.target.value; scanRows[i].got = false; }
     });

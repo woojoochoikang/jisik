@@ -192,7 +192,7 @@
       <div class="reco-head ${rc.tone}"><b>${esc(rc.head)}</b><p>${esc(rc.tip)}</p></div>
       <div class="reco-sub">지금 건강 상태 + <b>${esc(App.getState().goalLabel)}</b> 목표 + 냉장고 재료로 고른 추천 ${Date.now() - changedAt < 6000 ? '<span class="new">추천 변경됨</span>' : ""}</div>
       <div class="reco-cards">${rc.top.map((r, i) => `
-        <button type="button" class="reco-card" data-recipe="${r.id}"><span class="rk">${i + 1}</span><span class="em">${r.emoji}</span>
+        <button type="button" class="reco-card" data-recipe="${r.id}"><span class="rk">${i + 1}</span><span class="em">${FoodPhotos.recipe(r.id)}</span>
           <b>${esc(r.name)}</b><small>${r.kcal}kcal · ${r.time}분${r.missing.length ? ` · 🛒 ${r.missing.length}개 부족` : ""}</small>
           <span class="whys">${r.why.map(w => `<i>✓ ${esc(w)}</i>`).join("")}</span></button>`).join("")}</div>`;
     // 상태 변화 알림

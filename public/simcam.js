@@ -24,7 +24,7 @@
   const cam = $("simCam"), scene = $("simScene");
   let selected = null, fresh = new Set(), queue = [], busy = false, auto = false, lastTop = null;
 
-  const emoji = n => App.emojiOf(n);
+  const emoji = n => FoodPhotos.ingredient(n);
   const posText = p => `${4 - p.shelf}층 ${COLS[p.column]} ${p.depth ? "뒤" : "앞"}`;
   const hash = s => { let h = 7; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
   const conf = f => 91 + hash(f.name + f.id) % 9;
@@ -105,7 +105,7 @@
     const changed = lastTop !== null && lastTop !== t.id;
     lastTop = t.id;
     const why = t.urgent.length ? `⏰ ${t.urgent.map(esc).join("·")} 먼저 사용` : t.missing ? `🛒 재료 ${t.missing}개 부족` : "✅ 지금 바로 만들 수 있어요";
-    box.innerHTML = `<span class="em">${t.emoji}</span><div><small>지금 추천 1위${changed ? '<span class="new">NEW</span>' : ""}</small><b>${esc(t.name)}</b><span class="why">${why}</span></div>
+    box.innerHTML = `<span class="em">${FoodPhotos.recipe(t.id)}</span><div><small>지금 추천 1위${changed ? '<span class="new">NEW</span>' : ""}</small><b>${esc(t.name)}</b><span class="why">${why}</span></div>
       <button type="button" class="ghost small" data-recipe="${t.id}">보기</button>`;
     if (changed) { box.classList.remove("changed"); void box.offsetWidth; box.classList.add("changed"); }
   }

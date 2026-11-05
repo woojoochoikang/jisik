@@ -43,12 +43,12 @@
           <div class="br-item lv-${lvl("bp").level}" style="--i:2"><span class="bi">❤️</span><small>혈압</small><b>${H.cur.sys}/${H.cur.dia} mmHg</b><em>${ICON[lvl("bp").level]} ${LBL[lvl("bp").level]}</em></div>` : ""}
           <div class="br-item ${urgent.length ? "lv-warn" : ""}" style="--i:3"><span class="bi">🧊</span><small>소비기한 임박</small><b>${urgent.length}개 재료</b><em>${urgent.slice(0, 3).map(f => esc(f.name)).join(", ") || "없어요"}</em></div>
         </div>
-        ${top ? `<div class="br-reco" style="--i:4"><span>${top.emoji}</span><div><small>오늘의 추천 1위</small><b>${esc(top.name)}</b><em>${top.urgent.length ? `⏰ ${top.urgent.map(esc).join("·")} 먼저 사용 · ` : ""}${top.kcal}kcal · 나트륨 ${top.sodium}mg</em></div></div>` : ""}
+        ${top ? `<div class="br-reco" style="--i:4"><span>${FoodPhotos.recipe(top.id)}</span><div><small>오늘의 추천 1위</small><b>${esc(top.name)}</b><em>${top.urgent.length ? `⏰ ${top.urgent.map(esc).join("·")} 먼저 사용 · ` : ""}${top.kcal}kcal · 나트륨 ${top.sodium}mg</em></div></div>` : ""}
         ${missNames.length ? `
         <div class="br-alert warn" style="--i:5">
           <b>🛒 부족한 재료 알림 · ${missNames.length}개</b>
           <p>추천 메뉴를 만들려면 이 재료가 더 필요해요.</p>
-          <ul>${miss.map(r => `<li><span>${r.emoji} ${esc(r.name)}</span><em>${r.missing.map(m => esc(m.name)).join(", ")}</em></li>`).join("")}</ul>
+          <ul>${miss.map(r => `<li><span>${FoodPhotos.recipe(r.id)} ${esc(r.name)}</span><em>${r.missing.map(m => esc(m.name)).join(", ")}</em></li>`).join("")}</ul>
         </div>
         <div class="br-alert ok" style="--i:6">
           <span>✅ ${added ? `부족한 재료 <b>${added}개</b>를 장바구니에 자동으로 추가했어요` : `부족한 재료가 장바구니에 담겨 있어요 (<b>${inCart}개</b>)`}</span>

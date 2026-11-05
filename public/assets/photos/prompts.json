@@ -1,0 +1,373 @@
+{
+  "method": "Built-in image_gen",
+  "recipes": 24,
+  "ingredients": 54,
+  "prompts": [
+    {
+      "id": "tofu-egg-scramble",
+      "prompt": "Use case: photorealistic-natural. Asset: food recipe photograph for Korean meal planner. A finished serving of Korean tofu and egg scramble, soft yellow scrambled eggs with crumbled white tofu, diced onions and small wilted spinach pieces on a white ceramic plate. 45-degree close food photography, natural window light, realistic moist textures, appetizing home-cooked appearance, warm neutral tabletop, entire plate in frame, no text, no graphics, no utensils obscuring food. Landscape composition."
+    },
+    {
+      "id": "chicken-salad",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 닭가슴살 샐러드 볼. Ingredients: 닭가슴살, 양상추, 방울토마토, 오이, 아보카도, 올리브유, 레몬즙. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "salmon-rice-bowl",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 연어 현미 포케. Ingredients: 연어, 현미밥, 아보카도, 오이, 양파, 간장, 참기름, 참깨. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "beef-bulgogi-rice",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 소고기 불고기 덮밥. Ingredients: 소고기, 양파, 대파, 당근, 밥, 간장, 설탕, 다진마늘, 참기름. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "oat-banana-porridge",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 바나나 오트밀 포리지. Ingredients: 귀리, 우유, 바나나, 견과류, 블루베리. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "greek-yogurt-bowl",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 그릭요거트 베리 볼. Ingredients: 그릭요거트, 블루베리, 사과, 견과류, 꿀. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "mackerel-grill",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 고등어 구이 & 채소찜. Ingredients: 고등어, 브로콜리, 양배추, 레몬, 올리브유. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "kimchi-fried-rice",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 김치 참치 볶음밥. Ingredients: 김치, 참치캔, 밥, 대파, 달걀, 참기름, 고춧가루. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "tofu-doenjang-soup",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 저염 두부 된장찌개. Ingredients: 두부, 애호박, 양파, 버섯, 대파, 된장, 다진마늘. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "sweetpotato-chicken",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 고구마 닭가슴살 오븐구이. Ingredients: 닭가슴살, 고구마, 브로콜리, 파프리카, 올리브유, 후추. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "egg-toast",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 아보카도 에그 토스트. Ingredients: 통밀빵, 아보카도, 달걀, 방울토마토, 후추. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "pork-kimchi-stew",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 돼지고기 김치찌개. Ingredients: 돼지고기, 김치, 두부, 양파, 대파, 고춧가루. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "shrimp-broccoli",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 새우 브로콜리 마늘볶음. Ingredients: 새우, 브로콜리, 마늘, 파프리카, 올리브유, 저염간장. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "lentil-curry",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 렌틸콩 채소 카레. Ingredients: 렌틸콩, 양파, 당근, 감자, 토마토, 카레가루, 현미밥. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "buckwheat-noodle",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 메밀 비빔국수. Ingredients: 메밀면, 오이, 달걀, 김치, 고추장, 식초, 참기름. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "bean-sprout-rice",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 콩나물 버섯밥. Ingredients: 콩나물, 버섯, 현미밥, 대파, 저염간장, 참기름. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "protein-shake",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 바나나 두유 단백 쉐이크. Ingredients: 두유, 바나나, 귀리, 견과류, 그릭요거트. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "tomato-egg-stir",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 토마토 달걀 볶음. Ingredients: 토마토, 달걀, 대파, 식용유, 소금. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "pumpkin-soup",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 단호박 두유 수프. Ingredients: 단호박, 양파, 두유, 견과류. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "beef-steak-potato",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 소고기 스테이크 & 감자. Ingredients: 소고기, 감자, 버섯, 마늘, 올리브유, 소금, 후추. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "spinach-namul",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 시금치 두부 무침. Ingredients: 시금치, 두부, 다진마늘, 참기름, 참깨. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "chicken-thigh-teriyaki",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 닭다리살 데리야끼 덮밥. Ingredients: 닭다리살, 양파, 밥, 대파, 간장, 설탕. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "cabbage-egg-pancake",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 양배추 달걀전 (오코노미 스타일). Ingredients: 양배추, 달걀, 당근, 참치캔, 식용유. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "seaweed-soup",
+      "prompt": "Use case: photorealistic-natural. Asset: finished food photograph for a Korean recipe app. Dish: 소고기 미역국. Ingredients: 미역, 소고기, 다진마늘, 참기름, 간장. Show the finished cooked dish accurately, not separate raw ingredients. Professional natural window-light food photography, authentic Korean home cooking, realistic texture, restrained styling, warm off-white ceramic plate or appropriate bowl on a light neutral tabletop, 45-degree view, entire serving within the frame, landscape composition. No writing, labels, illustration, graphic, collage or watermark."
+    },
+    {
+      "id": "ingredient-egg",
+      "names": "달걀 계란",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: two whole brown chicken eggs. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-tofu",
+      "names": "두부",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a block of fresh white firm tofu with one slice. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-milk",
+      "names": "우유",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a clear glass milk bottle, no label. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-soy-milk",
+      "names": "두유",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a glass of pale soy milk with a few soybeans. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-yogurt",
+      "names": "그릭요거트",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a small white bowl of thick Greek yogurt. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-cheese",
+      "names": "치즈",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: two slices of yellow cheese. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-kimchi",
+      "names": "김치",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a small white dish of Korean napa cabbage kimchi. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-spinach",
+      "names": "시금치",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a small bunch of fresh spinach with roots. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-lettuce",
+      "names": "양상추",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a head of fresh green lettuce. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-cabbage",
+      "names": "양배추",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a green cabbage with one half showing layers. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-perilla",
+      "names": "깻잎",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a small stack of fresh Korean perilla leaves. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-broccoli",
+      "names": "브로콜리",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: one fresh broccoli crown. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-tomato",
+      "names": "토마토",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: two ripe red tomatoes with green stems. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-cherry-tomato",
+      "names": "방울토마토",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: five cherry tomatoes on a vine. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-onion",
+      "names": "양파",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a golden onion and a cut half. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-garlic",
+      "names": "마늘 다진마늘",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: one garlic bulb and two peeled cloves. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-mushroom",
+      "names": "버섯",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: three fresh shiitake mushrooms. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-carrot",
+      "names": "당근",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: two carrots with trimmed green tops. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-banana",
+      "names": "바나나",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: two ripe yellow bananas. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-salmon",
+      "names": "연어",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a fresh raw salmon fillet. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-mackerel",
+      "names": "고등어",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: one fresh raw mackerel fillet silver skin visible. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-shrimp",
+      "names": "새우",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: four raw peeled shrimp. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-chicken",
+      "names": "닭가슴살",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: two raw skinless chicken breast fillets. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-chicken-thigh",
+      "names": "닭다리살",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: two boneless raw chicken thigh pieces. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-beef",
+      "names": "소고기",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: one raw beef steak. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-pork",
+      "names": "돼지고기",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: three slices of raw pork belly. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-brown-rice",
+      "names": "현미밥",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a small white bowl of cooked brown rice. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-rice",
+      "names": "밥",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a small white bowl of steamed white rice. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-oats",
+      "names": "귀리",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a small mound of rolled oats. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-nuts",
+      "names": "견과류",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a small pile of mixed almonds and walnuts. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-scallion",
+      "names": "대파",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: two Korean green onions white stems and green leaves. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-cucumber",
+      "names": "오이",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a cucumber and two slices. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-zucchini",
+      "names": "애호박",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: one pale green Korean zucchini and a slice. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-bean-sprouts",
+      "names": "콩나물",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a small pile of soybean sprouts. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-bread",
+      "names": "통밀빵",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: two slices of whole wheat bread. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-avocado",
+      "names": "아보카도",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: one avocado half with pit and a whole avocado. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-potato",
+      "names": "감자",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: two potatoes. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-sweetpotato",
+      "names": "고구마",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: one Korean sweet potato and one cut half. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-pumpkin",
+      "names": "단호박",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a small dark green kabocha pumpkin with one orange wedge. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-apple",
+      "names": "사과",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a red apple and one slice. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-pepper",
+      "names": "파프리카",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: one red and one yellow bell pepper. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-blueberry",
+      "names": "블루베리",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a handful of fresh blueberries. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-lemon",
+      "names": "레몬 레몬즙",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: one lemon and a cut half. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-corn",
+      "names": "옥수수",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: one yellow corn cob partly peeled. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-chili",
+      "names": "고추",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: two green chili peppers and one red chili. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-nori",
+      "names": "김",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: two square toasted nori seaweed sheets. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-seaweed",
+      "names": "미역",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a small pile of dried Korean wakame seaweed. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-tuna",
+      "names": "참치캔",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: an open unbranded tuna tin showing tuna flakes. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-noodles",
+      "names": "메밀면",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a bundle of uncooked brown buckwheat noodles. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-lentil",
+      "names": "렌틸콩",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a small white bowl of dried brown lentils. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-chickpea",
+      "names": "병아리콩",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a small white bowl of chickpeas. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-bottle",
+      "names": "올리브유 참기름 간장 저염간장 식용유 들기름 식초",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: an unbranded small glass cooking oil bottle. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-paste",
+      "names": "고추장 된장",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a small white dish of thick Korean seasoning paste. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    },
+    {
+      "id": "ingredient-seasoning",
+      "names": "소금 후추 설탕 알룰로스 참깨 꿀 카레가루 전분 고춧가루 물",
+      "prompt": "Use case: product-mockup. Asset: photographic ingredient thumbnail for refrigerator inventory. Subject: a small clear unbranded kitchen seasoning jar. Realistic grocery product photography, centered isolated object on pure white background, soft natural studio lighting, crisp detail and true natural colors, realistic texture, whole object visible with generous white margin, square composition. Only the named ingredient, no extra props, no packaging text, no labels, no illustration, no CGI, no border."
+    }
+  ]
+}

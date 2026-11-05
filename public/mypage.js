@@ -124,7 +124,7 @@
     $("myMealCount").textContent = items.length ? `${items.length}끼 · ${now.kcal}kcal` : "";
     $("myMeals").innerHTML = items.length ? items.map((it, i) => `
       <li>
-        ${it.photo ? `<img src="${it.photo}" alt="">` : `<span class="em">${esc(it.emoji || "🍽️")}</span>`}
+        ${it.photo ? `<img src="${it.photo}" alt="">` : `<span class="em">${it.id && JisikPhotos.recipes[it.id] ? FoodPhotos.recipe(it.id) : esc(it.emoji || "🍽️")}</span>`}
         <div><b>${esc(it.name)}</b><small>${esc(it.meal || "")}${it.meal ? " · " : ""}${it.time ? new Date(it.time).toTimeString().slice(0, 5) : ""} · ${it.source === "photo" ? "📸 사진 분석" : "🍳 레시피 완성"}</small></div>
         <span class="kc">${Math.round(it.kcal)}kcal<small>단백질 ${Math.round(it.protein || 0)}g</small></span>
         <button type="button" class="del" data-del="${i}" aria-label="${esc(it.name)} 기록 삭제">✕</button>

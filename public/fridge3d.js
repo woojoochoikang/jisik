@@ -14,7 +14,7 @@
   }
   const status = f => days(f.exp) < 0 ? 'expired' : days(f.exp) <= 3 ? 'soon' : 'fresh';
   const deadline = f => { const n = days(f.exp); return n < 0 ? `${-n}일 지남` : n === 0 ? '오늘까지' : n <= 10 ? `D-${n}` : ''; };
-  const emoji = name => (typeof EMOJI !== 'undefined' && EMOJI[name]) || '🥣';
+  const emoji = name => FoodPhotos.ingredient(name);
 
   function nextLocation(fridge) {
     const counts = new Map();

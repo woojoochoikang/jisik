@@ -20,7 +20,7 @@
     $("cartList").innerHTML = cart.length ? cart.map(c => `
       <li class="${c.done ? "done" : ""}">
         <label class="ck"><input type="checkbox" data-done="${c.id}" ${c.done ? "checked" : ""} aria-label="${esc(c.name)} 구매함"></label>
-        <span class="em">${App.emojiOf(c.name)}</span>
+        <span class="em">${FoodPhotos.ingredient(c.name)}</span>
         <div class="ci">
           <b>${esc(c.name)} <small>${esc(c.amount)}</small>${c.auto ? '<span class="auto">자동 추가</span>' : ""}</b>
           ${c.recipes.length ? `<small>🍳 ${c.recipes.map(esc).join(", ")}</small>` : ""}
