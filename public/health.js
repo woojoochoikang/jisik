@@ -83,6 +83,9 @@
     for (let i = 1; i <= 5; i++) { const t = i / 5; S[k][N - 6 + i] = +(from + (v - from) * t + (i < 5 ? noise(k === "temp" ? 0.05 : 3) : 0)).toFixed(k === "temp" ? 1 : 0); }
     if (k === "spo2") S[k] = S[k].map(x => Math.min(100, x));
   });
+  // 시연용: 오늘 걸음 수는 120걸음으로 고정 (그래프도 120걸음에서 끝나도록 비율 조정)
+  const STEPS_FIXED = 120;
+  { const last = S.steps[N - 1] || 1; S.steps = S.steps.map(v => Math.round(v / last * STEPS_FIXED)); }
   const cur = {}; Object.keys(S).forEach(k => { cur[k] = S[k][N - 1]; });
 
   // ---------- 상황 시뮬레이션 ----------
@@ -105,8 +108,7 @@
       cur[k] = +v.toFixed(d);
       S[k][N - 1] = cur[k];
     });
-    cur.steps += scen === "exercise" ? 40 + Math.round(rand() * 30) : Math.round(rand() * 6);
-    S.steps[N - 1] = cur.steps;
+    // 걸음 수는 고정 — 더 이상 올라가지 않음
     window.dispatchEvent(new CustomEvent("jisik:health"));
   }
   setInterval(tick, 2500);
