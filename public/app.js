@@ -78,6 +78,7 @@
     clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 2600);
   }
   function ddayBadge(d) {
+    if (d > 10) return "";
     if (d < 0) return `<span class="dday expired">${-d}일 지남</span>`;
     if (d === 0) return `<span class="dday today">D-day</span>`;
     if (d <= 3) return `<span class="dday soon">D-${d}</span>`;
@@ -166,6 +167,17 @@
 
   // ---------- 렌더링: 냉장고 ----------
   function renderFridge() {
+    if (window.Fridge3D) {
+      let changed = false;
+      state.fridge.forEach(f => {
+        if (!window.Fridge3D.validLocation(f.location)) {
+          f.location = window.Fridge3D.nextLocation(state.fridge);
+          changed = true;
+        }
+      });
+      if (changed) save();
+      window.Fridge3D.render(state.fridge);
+    }
     const list = [...state.fridge].sort((a, b) => a.exp.localeCompare(b.exp));
     $("#fridgeList").innerHTML = list.map(f => {
       const d = dday(f.exp);
@@ -184,7 +196,7 @@
     save(); renderFridge(); renderRecs();
     toast(`${emojiOf(name)} ${name} 추가 (${ddayText(dday(exp))})`);
   }
-  const ddayText = d => d < 0 ? `${-d}일 지남` : d === 0 ? "오늘까지" : `D-${d}`;
+  const ddayText = d => d < 0 ? `${-d}일 지남` : d === 0 ? "오늘까지" : d <= 10 ? `D-${d}` : "기한 여유";
 
   // ---------- 렌더링: 추천 ----------
   function renderRecs() {
@@ -200,7 +212,7 @@
     const ub = $("#urgentBanner");
     if (urgentItems.length || expired.length) {
       ub.hidden = false;
-      ub.innerHTML = (urgentItems.length ? `⏰ 곧 유통기한이 끝나요: ${urgentItems.map(f => `${emojiOf(f.name)} ${esc(f.name)}(${ddayText(dday(f.exp))})`).join(", ")} — 이 재료를 쓰는 레시피를 먼저 보여드려요.` : "")
+      ub.innerHTML = (urgentItems.length ? `<strong class="urgent-title">⏰ ${urgentItems.length}개 재료, 3일 안에 먼저 드세요!</strong>${urgentItems.map(f => `<span class="urgent-ingredient">${emojiOf(f.name)} ${esc(f.name)} <b>${ddayText(dday(f.exp))}</b></span>`).join(" ")}` : "")
         + (expired.length ? `<br>🗑️ 유통기한 지난 재료: ${expired.map(f => esc(f.name)).join(", ")} (추천에서 제외)` : "");
     } else ub.hidden = true;
 

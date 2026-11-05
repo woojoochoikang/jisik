@@ -7,6 +7,7 @@
   <meta name="description" content="냉장고 재료와 식단 목표로 오늘 만들 수 있는 맞춤 레시피를 추천해요.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥗</text></svg>">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="fridge3d.css">
 </head>
 <body>
   <header class="topbar">
@@ -17,7 +18,41 @@
     <div class="today" id="todayLabel"></div>
   </header>
 
+  <nav class="app-tabs" role="tablist" aria-label="주요 화면">
+    <button type="button" role="tab" id="mealTab" aria-controls="mealPanel" aria-selected="true" tabindex="0">🍳 오늘의 식단</button>
+    <button type="button" role="tab" id="fridgeTab" aria-controls="fridgePanel" aria-selected="false" tabindex="-1">🧊 내 냉장고를 한눈에</button>
+  </nav>
   <main class="layout">
+    <section class="fridge-studio" id="fridgePanel" role="tabpanel" aria-labelledby="fridgeTab" hidden>
+      <div class="studio-heading"><div><span class="studio-eyebrow">MY LITTLE KITCHEN</span><h1 id="studioTitle">내 냉장고를 한눈에.</h1><p>몇 층에, 어떤 재료가 있는지. 문을 열어 확인해요.</p></div><span class="studio-live">카메라 연동 미리보기</span></div>
+      <div class="fridge-expiry-alert" id="fridgeExpiryAlert" aria-live="polite" hidden></div>
+      <div class="studio-body">
+        <div class="fridge-scene-panel">
+          <div class="scene-toolbar"><span id="fridge3dCount"></span><button type="button" id="fridgeDoorToggle" aria-expanded="true">문 닫기</button></div>
+          <div class="fridge-viewport" id="fridgeViewport" aria-label="3D 냉장고. 빈 배경을 좌우로 끌어 회전할 수 있습니다.">
+            <div class="fridge-world" id="fridgeWorld">
+              <div class="fridge-cabinet">
+                <div class="fridge-back"></div><div class="fridge-wall wall-left"></div><div class="fridge-wall wall-right"></div><div class="fridge-ceiling"></div>
+                <div class="fridge-light"></div><div class="fridge-inner-brand">jisik <span>FRESH EVERY DAY</span></div>
+                <div id="fridgeShelves"></div><div id="fridgeFoods"></div>
+                <div class="fridge-door" id="fridgeDoor"><span class="door-logo">지식<span>지루하지 않은 식단</span></span><span class="door-handle"></span><span class="door-note">오늘도 신선한 한 끼 🌱</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="scene-controls"><span>↔ 드래그로 둘러보기</span><label>시점 <input id="fridgeAngle" type="range" min="-28" max="28" value="-12" aria-label="냉장고 회전 각도"></label><button type="button" id="fridgeViewReset">정면 보기</button></div>
+          <div class="scene-legend"><span><i></i> 여유 있어요</span><span><i class="soon"></i> 3일 이내</span><span><i class="expired"></i> 기한 지남</span></div>
+        </div>
+        <aside class="fridge-inspector">
+          <div class="inspector-top"><span class="studio-eyebrow">FRIDGE INVENTORY</span><span id="fridgeUrgentCount"></span></div>
+          <h2>층별 보관 위치</h2><p class="inspector-intro">재료를 누르면 보관 위치와 유통기한을 확인할 수 있어요.</p>
+          <div id="fridgeSelected" class="fridge-selected" aria-live="polite"></div>
+          <p class="camera-preview-note">냉장고 카메라가 인식한 재료의 위치를 확인하는 화면입니다. 현재는 시연용 예시 위치를 보여드려요.</p>
+          <div class="shelf-list" id="fridgeShelfList"></div>
+          <a class="fridge-add-link" href="#fridgeCard">＋ 냉장고에 재료 추가하기</a>
+        </aside>
+      </div>
+    </section>
+    <div class="meal-panel" id="mealPanel" role="tabpanel" aria-labelledby="mealTab">
     <!-- 왼쪽: 목표 + 냉장고 -->
     <aside class="side">
       <section class="card" id="goalCard">
@@ -84,6 +119,7 @@
       <div class="grid" id="recGrid"></div>
       <p class="empty big" id="recEmpty" hidden>조건에 맞는 레시피가 없어요. 필터를 풀거나 재료를 더 추가해보세요.</p>
     </section>
+    </div>
   </main>
 
   <!-- 레시피 상세 -->
@@ -188,6 +224,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="recipes.js"></script>
+  <script src="fridge3d.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
